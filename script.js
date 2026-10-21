@@ -192,6 +192,16 @@
       renderLesson({ example: true });
     });
 
+    document.querySelectorAll(".topic-card").forEach(card => {
+      card.addEventListener("click", () => {
+        const chosenTopic = card.dataset.topic;
+        topicSelect.value = chosenTopic;
+        questionInput.value = `Explain ${chosenTopic.toLowerCase()} with a simple example`;
+        document.getElementById("tutor").scrollIntoView({ behavior: "smooth", block: "start" });
+        questionInput.focus({ preventScroll: true });
+      });
+    });
+
     // Allow Enter to submit only when the user is not inserting a new line in the textarea.
     questionInput.addEventListener("keydown", event => {
       if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {

@@ -1,21 +1,17 @@
-# cH Code Helper (fixed prototype)
+# cH Code Helper
 
-A responsive static website that helps programming learners understand logic before code.
+A responsive student-project prototype for learning programming concepts step by step.
 
-## Files
-- `index.html`: page structure and tutor form
-- `style.css`: visual design and responsive layout
-- `script.js`: form handling and sample lesson generation
-
-## Test locally
-1. Extract this ZIP.
-2. Keep all files together in the same folder.
-3. Open `index.html` in a browser.
-4. Enter `Explain loops` and click **Build my learning steps**.
-5. The learning steps should appear in the learning guide panel.
-
-## Publish with GitHub Pages
-Upload the files in this folder to the root of your repository and commit the changes. In Settings → Pages, select **Deploy from a branch**, branch `main`, folder `/(root)`, then Save. Wait for the deployment to finish.
+## Features
+- Beginner and Intermediate learning levels
+- Python, Java, C, C++, and JavaScript sample snippets
+- Topic-based sample lessons with learning steps, code, expected output, and a practice challenge
+- Topic cards that prefill the lesson form
+- Responsive layout for mobile and desktop
+- No API key or backend required for this demo
 
 ## Important
-This is a static prototype with prepared sample guidance. It does not call a real AI model and does not save user accounts or conversation history. A real AI tutor requires a backend API; never put a private AI API key in `script.js` or any browser-visible file.
+This version generates sample lessons in the browser. It is not connected to a live AI model and does not execute code. A backend and securely stored API key are needed to add real AI tutoring.
+
+## Deploy with GitHub Pages
+Upload `index.html`, `style.css`, and `script.js` to the root of your repository and commit the changes. Keep the paths and filenames unchanged.
