@@ -6,8 +6,9 @@
   <meta name="description" content="cH Code Helper helps learners understand programming logic, follow steps, and practice coding concepts.">
   <meta name="theme-color" content="#fff8f2">
   <title>cH | Code Helper</title>
-  <link rel="stylesheet" href="style.css?v=3">
-  <script src="script.js?v=3" defer></script>
+  <link rel="stylesheet" href="style.css?v=4">
+  <script src="api-config.js?v=4" defer></script>
+  <script src="script.js?v=4" defer></script>
 </head>
 <body>
   <div class="announcement"><span class="announcement-dot"></span> A friendlier way to learn programming <a href="#tutor">Try the tutor <span aria-hidden="true">→</span></a></div>
@@ -88,11 +89,11 @@
           <textarea id="question" name="question" rows="4" placeholder="For example: Explain loops with a simple example" aria-describedby="questionHelp" required></textarea>
           <p id="questionHelp" class="helper-text">Be specific if you can. You can ask about a concept, an example, or how to start solving a problem.</p>
           <button class="primary-btn full-btn" id="submitBtn" type="submit">Build my learning steps <span aria-hidden="true">→</span></button>
-          <p class="form-note"><span>ⓘ</span> Prototype mode: sample lessons are generated in your browser. A live AI tutor is not connected yet.</p>
+          <p class="form-note"><span>ⓘ</span> Live AI tutor: asks are sent securely to the cH backend. Do not enter passwords or private personal information.</p>
           <p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
         </form>
         <section class="answer-panel" aria-live="polite" aria-labelledby="answerTitle">
-          <div class="answer-top"><div class="answer-symbol">✦</div><div><small>YOUR PERSONAL GUIDE</small><h3 id="answerTitle">Your lesson starts here</h3></div><span class="demo-tag">SAMPLE</span></div>
+          <div class="answer-top"><div class="answer-symbol">✦</div><div><small>YOUR PERSONAL GUIDE</small><h3 id="answerTitle">Your lesson starts here</h3></div><span class="demo-tag" id="answerModeTag">AI READY</span></div>
           <div id="answerContent" class="answer-content">
             <div class="empty-state"><div class="empty-icon">{ }</div><strong>Ready when you are.</strong><p>Submit a question to see a lesson with clear logic, code, output, and a small challenge.</p><button id="exampleBtn" class="secondary-btn" type="button">Load a sample lesson <span aria-hidden="true">↗</span></button></div>
           </div>
