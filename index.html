@@ -3,72 +3,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#f7f4ef">
-  <meta name="description" content="cH Code Helper helps coding students understand programming logic step by step.">
-  <title>cH Code Helper | The cH Learning Space</title>
+
+  <meta name="theme-color" content="#08090b">
+  <meta
+    name="description"
+    content="cH Code Helper is your personal AI programming tutor. Learn programming logic step by step, practise independently, and build your coding confidence."
+  >
+
+  <title>cH Code Helper | Learn the Logic</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <header class="site-header">
     <p class="eyebrow">THE cH LEARNING SPACE</p>
-    <h1>Let's solve it <span>step by step.</span></h1>
+
+    <h1>
+      Let's solve it
+      <span>step by step.</span>
+    </h1>
+
     <p class="intro">
-      Choose your level and language, then ask your question.
-      Your learning journey starts here.
+      Understand the logic before writing the code.
+      Your personal AI programming tutor helps you learn,
+      practise, and build independently.
     </p>
   </header>
 
   <main>
-    <section class="learning-card">
+    <!-- Learning form -->
+    <section class="learning-card" aria-labelledby="setup-title">
+
       <div class="section-heading">
-        <span class="step-number">01</span>
+        <span class="step-number" aria-hidden="true">01</span>
+
         <div>
-          <h2>Set up your lesson</h2>
+          <h2 id="setup-title">Set up your lesson</h2>
           <p>Learn at your own pace.</p>
         </div>
       </div>
 
       <form id="question-form">
+
         <label for="level">Your level</label>
-        <select id="level" name="level">
+        <select id="level" name="level" required>
           <option value="Beginner">Beginner</option>
           <option value="Intermediate">Intermediate</option>
         </select>
 
         <label for="language">Programming language</label>
-        <select id="language" name="language">
-          <option>Python</option>
-          <option>Java</option>
-          <option>JavaScript</option>
-          <option>C</option>
-          <option>C++</option>
+        <select id="language" name="language" required>
+          <option value="Python">Python</option>
+          <option value="Java">Java</option>
+          <option value="JavaScript">JavaScript</option>
+          <option value="C">C</option>
+          <option value="C++">C++</option>
         </select>
 
         <label for="topic">Topic</label>
-        <select id="topic" name="topic">
-          <option>Loops</option>
-          <option>Arrays</option>
-          <option>Variables</option>
-          <option>Functions</option>
-          <option>Conditions</option>
-          <option>Object-Oriented Programming</option>
-          <option>Data Structures</option>
-          <option>Other</option>
+        <select id="topic" name="topic" required>
+          <option value="Loops">Loops</option>
+          <option value="Arrays">Arrays</option>
+          <option value="Variables">Variables</option>
+          <option value="Functions">Functions</option>
+          <option value="Conditions">Conditions</option>
+          <option value="Object-Oriented Programming">
+            Object-Oriented Programming
+          </option>
+          <option value="Data Structures">Data Structures</option>
+          <option value="Algorithms">Algorithms</option>
+          <option value="Other">Other</option>
         </select>
 
-        <label for="question">What do you want to understand?</label>
+        <label for="question">
+          What do you want to understand?
+        </label>
+
         <textarea
           id="question"
           name="question"
           rows="5"
           maxlength="4000"
-          placeholder="Example: Explain loops with a simple example."
+          placeholder="Example: Explain loops with a simple Python example."
+          aria-describedby="question-help"
           required
         ></textarea>
 
-        <p class="helper-text">
-          Be specific if you can. Ask about a concept, an example,
-          or how to start solving a problem.
+        <p class="helper-text" id="question-help">
+          Ask about a concept, an example, or how to begin
+          solving a programming problem.
         </p>
 
         <button id="submit-button" type="submit">
@@ -76,33 +107,64 @@
         </button>
 
         <p class="privacy-note">
-          Live AI tutor: questions are sent to the cH backend.
+          Live AI tutor: your question is sent to the cH backend.
           Do not enter passwords or private personal information.
         </p>
 
-        <p id="connection-status" role="status" aria-live="polite">
+        <p
+          id="connection-status"
+          role="status"
+          aria-live="polite"
+        >
           Checking backend configuration...
         </p>
+
       </form>
     </section>
 
-    <section class="lesson-card" aria-labelledby="lesson-title">
+    <!-- AI lesson area -->
+    <section
+      class="lesson-card"
+      aria-labelledby="lesson-title"
+    >
+
       <div class="lesson-heading">
+
         <div>
           <p class="eyebrow">YOUR PERSONAL GUIDE</p>
-          <h2 id="lesson-title">Your lesson starts here</h2>
+
+          <h2 id="lesson-title">
+            Your lesson starts here
+          </h2>
         </div>
-        <span id="connection-badge">CHECKING</span>
+
+        <!-- Glowing bulb activated when a question is submitted -->
+        <div
+          class="idea-bulb"
+          id="idea-bulb"
+          role="img"
+          aria-label="Learning idea bulb"
+        >
+          💡
+        </div>
+
+        <span id="connection-badge">
+          CHECKING
+        </span>
+
       </div>
 
       <div id="lesson-output" aria-live="polite">
-        <p>Submit a question to receive a lesson with clear logic,
-          an example, and a practice challenge.</p>
+        <p>
+          Submit a question to receive a lesson with clear logic,
+          a worked example, and a practice challenge.
+        </p>
       </div>
 
       <button id="sample-button" type="button">
         Load a sample lesson
       </button>
+
     </section>
   </main>
 
@@ -110,7 +172,10 @@
     <p>cH Code Helper · Learn the logic. Build it yourself.</p>
   </footer>
 
-  <!-- Configuration must load before the main application script. -->
+  <!-- Decorative bee following pointer movement -->
+  <div id="cursor-bee" aria-hidden="true">🐝</div>
+
+  <!-- Load configuration before the main application -->
   <script src="api-config.js"></script>
   <script src="script.js"></script>
 </body>
