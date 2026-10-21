@@ -1,36 +1,21 @@
-# cH Code Helper
+# cH Code Helper (fixed prototype)
 
-cH is a responsive front-end prototype for a programming learning assistant. Its goal is to help learners understand logic and steps before they write code, rather than only copying a final answer.
-
-## Features
-- Responsive landing page
-- Beginner and Intermediate levels
-- Topic selection: Loops, Arrays, Functions, Problem solving, Variables
-- Language selection: Python, Java, C, C++, JavaScript
-- Step-by-step sample learning guide generated in the browser
-- No installation or API key required for the demo
-
-## Run locally
-1. Download or extract this folder.
-2. Open `index.html` in Chrome, Edge, or Firefox.
-3. Click **Try the learning tutor** and submit a topic.
-
-You can also open the folder in Visual Studio Code and use the Live Server extension, but it is not required.
-
-## Important project note
-This version is a front-end prototype. It uses sample lesson content in `script.js`; it does not call an AI model or save user accounts/data. To add real AI responses later, build a small backend API and store the AI API key in the backend environment, never in browser JavaScript.
-
-## Publish with GitHub Pages
-1. Create a repository on GitHub.
-2. Upload `index.html`, `style.css`, `script.js`, `README.md`, and `.gitignore` to the repository root.
-3. Open **Settings → Pages**.
-4. Under the build/deployment section, choose **Deploy from a branch**.
-5. Choose branch `main` and folder `/ (root)`, then save.
-6. Wait for the published URL shown in the Pages section.
+A responsive static website that helps programming learners understand logic before code.
 
 ## Files
-- `index.html` — page structure and content
-- `style.css` — layout, colors, responsive styling
-- `script.js` — demo tutor interactions
-- `.gitignore` — ignores common local files
-- `.env.example` — placeholder for a future backend; no secrets included
+- `index.html`: page structure and tutor form
+- `style.css`: visual design and responsive layout
+- `script.js`: form handling and sample lesson generation
+
+## Test locally
+1. Extract this ZIP.
+2. Keep all files together in the same folder.
+3. Open `index.html` in a browser.
+4. Enter `Explain loops` and click **Build my learning steps**.
+5. The learning steps should appear in the learning guide panel.
+
+## Publish with GitHub Pages
+Upload the files in this folder to the root of your repository and commit the changes. In Settings → Pages, select **Deploy from a branch**, branch `main`, folder `/(root)`, then Save. Wait for the deployment to finish.
+
+## Important
+This is a static prototype with prepared sample guidance. It does not call a real AI model and does not save user accounts or conversation history. A real AI tutor requires a backend API; never put a private AI API key in `script.js` or any browser-visible file.

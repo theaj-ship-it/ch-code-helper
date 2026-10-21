@@ -1,20 +1,22 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="cH Code Helper helps beginner programmers understand logic before writing code.">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="cH Code Helper teaches programming logic and implementation steps before code.">
+  <meta name="theme-color" content="#101426">
   <title>cH | Code Helper</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=2">
+  <script src="script.js?v=2" defer></script>
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="#" aria-label="cH Code Helper home"><span class="brand-mark">cH</span><span>Code Helper</span></a>
-    <nav><a href="#how-it-works">How it works</a><a href="#tutor">Try the tutor</a></nav>
+    <a class="brand" href="#home" aria-label="cH Code Helper home"><span class="brand-mark">cH</span><span>Code Helper</span></a>
+    <nav aria-label="Main navigation"><a href="#how-it-works">How it works</a><a href="#tutor">Try the tutor</a></nav>
     <a class="top-cta" href="#tutor">Start learning <span aria-hidden="true">↗</span></a>
   </header>
 
-  <main>
+  <main id="home">
     <section class="hero">
       <div class="hero-copy">
         <div class="eyebrow"><span class="pulse"></span> YOUR PERSONAL CODING COMPANION</div>
@@ -25,9 +27,9 @@
       </div>
       <div class="hero-visual" aria-label="Example of a step-by-step coding lesson">
         <div class="window">
-          <div class="window-bar"><div class="window-dots"><i></i><i></i><i></i></div><span>learning_space.py</span><span class="live-pill">● LIVE PREVIEW</span></div>
+          <div class="window-bar"><div class="window-dots"><i></i><i></i><i></i></div><span>learning_space.py</span><span class="live-pill">● LEARNING PREVIEW</span></div>
           <div class="code-area"><div class="line"><span class="ln">01</span><span><b class="purple">for</b> number <b class="purple">in</b> range(<b class="orange">1, 4</b>):</span></div><div class="line"><span class="ln">02</span><span class="indent"><b class="blue">print</b>(number)</span></div><div class="code-comment"># Small steps. Clear logic. Your progress.</div></div>
-          <div class="coach-card"><div class="coach-icon">✦</div><div><strong>Let's understand this</strong><p>The loop repeats the same action for each number in the range.</p></div><span class="check">✓</span></div>
+          <div class="coach-card"><div class="coach-icon">✦</div><div><strong>Let's understand this</strong><p>A loop repeats an action for each item in a sequence.</p></div><span class="check">✓</span></div>
           <div class="progress-row"><span>YOUR LEARNING PATH</span><div class="progress-track"><i></i></div><b>Step 1 of 3</b></div>
         </div>
         <div class="floating-note"><span class="note-icon">✧</span><div><b>Learn by understanding</b><small>Not just copying code</small></div></div>
@@ -37,38 +39,45 @@
     <section class="feature-strip" id="how-it-works">
       <article><div class="feature-icon purple-bg">01</div><div><h3>Understand the concept</h3><p>Start with a simple explanation in everyday language.</p></div></article>
       <article><div class="feature-icon blue-bg">02</div><div><h3>Follow the steps</h3><p>Break the problem into a sequence you can follow.</p></div></article>
-      <article><div class="feature-icon green-bg">03</div><div><h3>Try it yourself</h3><p>Use hints and examples to build your own solution.</p></div></article>
+      <article><div class="feature-icon green-bg">03</div><div><h3>Try it yourself</h3><p>Use examples and a small challenge to build your own solution.</p></div></article>
     </section>
 
     <section class="tutor-section" id="tutor">
       <div class="section-heading"><div class="eyebrow">THE LEARNING SPACE</div><h2>Let's solve it <span>step by step.</span></h2><p>Choose a topic, tell us what you want to understand, and start learning.</p></div>
       <div class="tutor-layout">
         <form class="tutor-form" id="tutorForm">
-          <label for="level">Your level</label>
-          <div class="segmented"><label><input type="radio" name="level" value="Beginner" checked><span>Beginner</span></label><label><input type="radio" name="level" value="Intermediate"><span>Intermediate</span></label></div>
+          <label>Your level</label>
+          <div class="segmented">
+            <label><input type="radio" name="level" value="Beginner" checked><span>Beginner</span></label>
+            <label><input type="radio" name="level" value="Intermediate"><span>Intermediate</span></label>
+          </div>
           <label for="language">Programming language</label>
-          <select id="language"><option>Python</option><option>Java</option><option>C</option><option>C++</option><option>JavaScript</option></select>
+          <select id="language" name="language">
+            <option>Python</option><option>Java</option><option>C</option><option>C++</option><option>JavaScript</option>
+          </select>
           <label for="topic">Choose a topic</label>
-          <select id="topic"><option value="Loops">Loops</option><option value="Arrays">Arrays</option><option value="Functions">Functions</option><option value="Problem solving">Problem solving</option><option value="Variables">Variables</option></select>
+          <select id="topic" name="topic">
+            <option value="Loops">Loops</option><option value="Arrays">Arrays</option><option value="Functions">Functions</option><option value="Problem solving">Problem solving</option><option value="Variables">Variables</option>
+          </select>
           <label for="question">What do you want to understand?</label>
-          <textarea id="question" rows="3" placeholder="Example: Explain loops with a simple example"></textarea>
-          <button class="primary-btn full-btn" type="submit">Build my learning steps <span>→</span></button>
-          <p class="form-note">Demo mode: sample learning guidance is generated in your browser.</p>
+          <textarea id="question" name="question" rows="3" placeholder="Example: Explain loops with a simple example" aria-describedby="questionHelp"></textarea>
+          <p id="questionHelp" class="helper-text">Tip: Try “Explain loops”, “How do arrays work?” or “What is a function?”</p>
+          <button class="primary-btn full-btn" id="submitBtn" type="submit">Build my learning steps <span>→</span></button>
+          <p class="form-note">Prototype mode: sample learning guidance is generated in your browser, without an AI API.</p>
+          <p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
         </form>
-        <section class="answer-panel" aria-live="polite">
+        <section class="answer-panel" aria-live="polite" aria-labelledby="answerTitle">
           <div class="answer-top"><span class="sparkle">✦</span><div><small>cH LEARNING GUIDE</small><h3 id="answerTitle">Your lesson will appear here</h3></div><span class="demo-tag">DEMO</span></div>
-          <div id="answerContent" class="answer-content"><div class="empty-illustration"><span>?</span></div><p class="empty-title">Ready when you are.</p><p class="empty-copy">Fill in the form and cH will turn your topic into a clear learning path.</p></div>
+          <div id="answerContent" class="answer-content">
+            <div class="empty-illustration"><span>?</span></div><p class="empty-title">Ready when you are.</p><p class="empty-copy">Fill in the form and cH will turn your topic into a clear learning path.</p>
+          </div>
           <div class="answer-footer"><span>✧ Learn the logic, then implement it.</span><button id="exampleBtn" type="button">Try an example ↗</button></div>
         </section>
       </div>
     </section>
 
-    <section class="closing">
-      <div><div class="eyebrow">YOUR NEXT STEP STARTS HERE</div><h2>Code with confidence.<br><span>One concept at a time.</span></h2></div>
-      <a class="primary-btn" href="#tutor">Start learning <span>→</span></a>
-    </section>
+    <section class="closing"><div><div class="eyebrow">YOUR NEXT STEP STARTS HERE</div><h2>Code with confidence.<br><span>One concept at a time.</span></h2></div><a class="primary-btn" href="#tutor">Start learning <span>→</span></a></section>
   </main>
-  <footer><a class="brand" href="#"><span class="brand-mark">cH</span><span>Code Helper</span></a><p>Made to help learners think, understand, and build.</p><span>© 2026 cH Code Helper · Student project prototype</span></footer>
-  <script src="script.js"></script>
+  <footer><a class="brand" href="#home"><span class="brand-mark">cH</span><span>Code Helper</span></a><p>Made to help learners think, understand, and build.</p><span>© 2026 cH Code Helper · Student project prototype</span></footer>
 </body>
 </html>
