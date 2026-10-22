@@ -1,3 +1,4 @@
+
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -7,7 +8,6 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
 const apiKey = process.env.GEMINI_API_KEY;
 const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
@@ -24,11 +24,9 @@ const allowedOrigins = (
 app.use(
   cors({
     origin(origin, callback) {
-      // Permit requests without an Origin header, such as health checks.
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
-
       return callback(new Error("Origin not allowed by CORS"));
     },
   })
@@ -36,25 +34,24 @@ app.use(
 
 app.use(express.json({ limit: "100kb" }));
 
-// Health check: confirms that the server is running and configured.
 app.get("/health", (req, res) => {
-  res.json({
-    status: "ok",
-    configured: Boolean(ai),
-  });
+  res.json({ status: "ok", configured: Boolean(ai) });
 });
 
-// Main cH AI tutoring endpoint.
+// Existing lesson-generation endpoint.
 app.post("/api/ask", async (req, res) => {
   try {
     if (!ai) {
       return res.status(503).json({
-        error: "AI service is not configured. Please try again later.",
+        error: "AI service is not configured.",
       });
     }
 
-    const { question, language = "Python", level = "Beginner" } =
-      req.body || {};
+    const {
+      question,
+      language = "Python",
+      level = "Beginner",
+    } = req.body || {};
 
     if (typeof question !== "string" || !question.trim()) {
       return res.status(400).json({
@@ -64,7 +61,7 @@ app.post("/api/ask", async (req, res) => {
 
     if (question.length > 4000) {
       return res.status(400).json({
-        error: "Your question is too long. Please keep it under 4000 characters.",
+        error: "Please keep your question under 4000 characters.",
       });
     }
 
@@ -80,70 +77,38 @@ app.post("/api/ask", async (req, res) => {
         : "Beginner";
 
     const prompt = `
-You are cH Code Helper, a personal AI programming tutor
-for engineering students and coding beginners.
+You are cH Code Helper, an adaptive programming tutor.
 
-Your mission is to help students understand programming
-logic and solve problems independently, not merely copy code.
-
-Programming language: ${safeLanguage}
+Language: ${safeLanguage}
 Student level: ${safeLevel}
 
 Student question:
 ${question.trim()}
 
-TEACHING RULES
+For Beginner students:
+- Use simple English and small numbered steps.
+- Explain important lines of code.
+- Include a relevant example and expected output.
+- Explain a common mistake.
+- Finish with a practice task and hint.
 
-If the student is a Beginner:
-- Use simple English and explain unfamiliar terms.
-- Use relatable, practical examples.
-- Break the solution into small numbered steps.
-- Explain what each important line of code does.
-- Show a small working example and expected output when relevant.
-- Explain one common mistake and how to avoid it.
-- Finish with one practice task and a helpful hint.
+For Intermediate students:
+- Explain the problem-solving approach and why it works.
+- Discuss edge cases and alternatives when relevant.
+- Explain time and space complexity when appropriate.
+- Include code when useful or explicitly requested.
+- Finish with a meaningful challenge.
 
-If the student is Intermediate:
-- Start with the problem-solving approach.
-- Explain why the approach works.
-- Provide a useful hint before the full solution.
-- Show complete code when requested or useful.
-- Explain time and space complexity when relevant.
-- Discuss edge cases and alternative approaches when useful.
-- Finish with a challenge that extends the original problem.
-
-RESPONSE STRUCTURE
-
+Use these sections:
 1. Concept
-Explain the main idea and why it matters.
-
 2. Logic and Steps
-Describe the solution in a clear sequence.
-
 3. Example
-Give a practical example. Include code and expected output
-when appropriate.
-
 4. Common Mistake
-Explain one relevant error or misconception.
-
 5. Your Turn
-Give one practice question or coding challenge with a hint.
-Do not immediately solve the practice task.
-
 6. Next Step
-Suggest one small concept to learn next.
 
-IMPORTANT
-- Keep explanations focused and easy to scan.
-- Do not make every answer unnecessarily long.
-- Respect the requested programming language.
-- Use valid code examples and explain important syntax.
-- Never claim code was executed or tested unless it was.
-- Do not invent program output.
-- If essential information is missing, ask a short question.
-- If the question is not about programming, answer briefly
-  and guide the student toward their learning goal.
+Keep the explanation focused. Respect the requested language.
+Never claim that code was executed unless it actually was.
 `;
 
     const response = await ai.models.generateContent({
@@ -155,25 +120,152 @@ IMPORTANT
 
     if (typeof answer !== "string" || !answer.trim()) {
       return res.status(502).json({
-        error: "The AI returned an empty response. Please try again.",
+        error: "The AI returned an empty lesson.",
       });
     }
 
     return res.json({ answer: answer.trim() });
   } catch (error) {
-    // Keep detailed diagnostics in Render logs, not in public responses.
-    console.error(
-      "Gemini request failed:",
-      error?.message || "Unknown error"
-    );
-
+    console.error("Lesson request failed:", error?.message || error);
     return res.status(500).json({
-      error: "cH could not generate a lesson right now. Please try again.",
+      error: "Could not generate the lesson. Please try again.",
     });
   }
 });
 
-// Unknown routes.
+// New endpoint: create a challenge with two progressive hints and a solution.
+app.post("/api/challenge", async (req, res) => {
+  try {
+    if (!ai) {
+      return res.status(503).json({
+        error: "AI service is not configured.",
+      });
+    }
+
+    const { language = "Python", level = "Beginner", topic = "Other" } =
+      req.body || {};
+
+    const safeLanguage =
+      typeof language === "string" && language.trim()
+        ? language.trim().slice(0, 50)
+        : "Python";
+
+    const safeLevel =
+      typeof level === "string" &&
+      level.toLowerCase() === "intermediate"
+        ? "Intermediate"
+        : "Beginner";
+
+    const safeTopic =
+      typeof topic === "string" && topic.trim()
+        ? topic.trim().slice(0, 100)
+        : "General programming";
+
+    const prompt = `
+You are cH Code Helper, an adaptive programming challenge designer.
+
+Create ONE original programming practice challenge.
+
+Programming language: ${safeLanguage}
+Student level: ${safeLevel}
+Topic: ${safeTopic}
+
+Difficulty requirements:
+- Beginner: small, approachable problem; clear goal; minimal prerequisites;
+  use familiar concepts and avoid unnecessary complexity.
+- Intermediate: require reasoning and implementation choices; include
+  relevant constraints or edge cases; discuss complexity in the solution.
+
+Return ONLY valid JSON. Do not use Markdown fences or text outside JSON.
+Use exactly this structure:
+{
+  "title": "Short challenge title",
+  "problem": "Clear problem statement in simple language",
+  "requirements": ["Requirement one", "Requirement two"],
+  "exampleInput": "Example input, or a brief description if not applicable",
+  "exampleOutput": "Correct expected output",
+  "hints": [
+    "First hint: a gentle direction, not the full answer",
+    "Second hint: a more specific clue, still not the full code"
+  ],
+  "solution": "Complete valid code in the requested language",
+  "explanation": "Explain the solution step by step for the selected level",
+  "complexity": "Time and space complexity when relevant; otherwise say Not applicable"
+}
+
+Ensure the example output matches the solution logically.
+Use valid ${safeLanguage} syntax. Do not claim that code was executed.
+The hints must not contain the complete solution.
+The solution should solve the exact problem and address relevant edge cases.
+`;
+
+    const response = await ai.models.generateContent({
+      model,
+      contents: prompt,
+    });
+
+    const raw = response.text;
+
+    if (typeof raw !== "string" || !raw.trim()) {
+      return res.status(502).json({
+        error: "The AI returned an empty challenge.",
+      });
+    }
+
+    const cleaned = raw
+      .trim()
+      .replace(/^```(?:json)?\s*/i, "")
+      .replace(/\s*```$/, "");
+
+    let challenge;
+
+    try {
+      challenge = JSON.parse(cleaned);
+    } catch {
+      console.error("Challenge response was not valid JSON.");
+      return res.status(502).json({
+        error: "The AI returned an invalid challenge. Please try again.",
+      });
+    }
+
+    const valid =
+      typeof challenge.title === "string" &&
+      typeof challenge.problem === "string" &&
+      Array.isArray(challenge.requirements) &&
+      Array.isArray(challenge.hints) &&
+      challenge.hints.length >= 2 &&
+      typeof challenge.solution === "string" &&
+      typeof challenge.explanation === "string";
+
+    if (!valid) {
+      return res.status(502).json({
+        error: "The AI challenge was incomplete. Please try again.",
+      });
+    }
+
+    // Keep hints and solution in the backend response.
+    // The frontend reveals them only through the challenge controls.
+    return res.json({
+      challenge: {
+        title: challenge.title,
+        problem: challenge.problem,
+        requirements: challenge.requirements.slice(0, 8),
+        exampleInput: String(challenge.exampleInput || ""),
+        exampleOutput: String(challenge.exampleOutput || ""),
+        hints: challenge.hints.slice(0, 2).map(String),
+        solution: challenge.solution,
+        explanation: challenge.explanation,
+        complexity: String(challenge.complexity || "Not applicable"),
+      },
+    });
+  } catch (error) {
+    console.error("Challenge request failed:", error?.message || error);
+    return res.status(500).json({
+      error: "Could not generate a challenge. Please try again.",
+    });
+  }
+});
+
 app.use((req, res) => {
   res.status(404).json({ error: "Endpoint not found." });
 });
