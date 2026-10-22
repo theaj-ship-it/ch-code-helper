@@ -1,7 +1,7 @@
 "use strict";
 
 document.addEventListener("DOMContentLoaded", () => {
-  // 1. Get page elements
+  // 1. Find the elements used by the website
   const form = document.getElementById("question-form");
   const levelSelect = document.getElementById("level");
   const languageSelect = document.getElementById("language");
@@ -19,12 +19,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const ideaBulb = document.getElementById("idea-bulb");
   const cursorBee = document.getElementById("cursor-bee");
 
-  // 2. Read backend configuration
+  // 2. Read the backend configuration
   const apiBaseUrl = String(
     window.CH_CONFIG?.API_BASE_URL || ""
   ).trim().replace(/\/+$/, "");
 
-  // 3. Display connection status
+  // 3. Update connection status safely
   function setConnectionStatus(message, badge) {
     if (connectionStatus) {
       connectionStatus.textContent = message;
@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // 4. Display messages safely
+  // 4. Display a message safely
   function showMessage(message) {
     if (!lessonOutput) return;
 
@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     lessonOutput.appendChild(paragraph);
   }
 
-  // 5. Display AI lessons without interpreting HTML from the AI
+  // 5. Display lesson text with basic formatting
   function showLesson(title, answer) {
     if (!lessonOutput || !lessonTitle) return;
 
@@ -54,8 +54,8 @@ document.addEventListener("DOMContentLoaded", () => {
     lessonOutput.replaceChildren();
 
     const lines = answer.split(/\r?\n/);
-    let codeLines = [];
     let insideCode = false;
+    let codeLines = [];
 
     function addCodeBlock() {
       const pre = document.createElement("pre");
@@ -88,26 +88,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!line) continue;
 
-      const headingMatch = line.match(/^#{1,4}\s+(.+)$/);
-      const numberedMatch = line.match(/^\d+[.)]\s+(.+)$/);
-      const bulletMatch = line.match(/^[-*]\s+(.+)$/);
+      const heading = line.match(/^#{1,4}\s+(.+)$/);
+      const numbered = line.match(/^(\d+[.)])\s+(.+)$/);
+      const bullet = line.match(/^[-*]\s+(.+)$/);
 
       let element;
       let content = line;
 
-      if (headingMatch) {
+      if (heading) {
         element = document.createElement("h3");
-        content = headingMatch[1];
-      } else if (numberedMatch || bulletMatch) {
-        element = document.createElement("p");
-        content = numberedMatch
-          ? `${line.match(/^\d+[.)]/)[0]} ${numberedMatch[1]}`
-          : `• ${bulletMatch[1]}`;
+        content = heading[1];
       } else {
         element = document.createElement("p");
+
+        if (numbered) {
+          content = `${numbered[1]} ${numbered[2]}`;
+        } else if (bullet) {
+          content = `• ${bullet[1]}`;
+        }
       }
 
-      // Support basic **bold** markers using safe text nodes.
+      // Format bold text without injecting HTML
       const parts = content.split(/(\*\*[^*]+\*\*)/g);
 
       for (const part of parts) {
@@ -123,13 +124,13 @@ document.addEventListener("DOMContentLoaded", () => {
       lessonOutput.appendChild(element);
     }
 
-    // Recover gracefully if the AI response has an unclosed code fence.
-    if (insideCode && codeLines.length) {
+    // Handle an unfinished code block gracefully
+    if (insideCode && codeLines.length > 0) {
       addCodeBlock();
     }
   }
 
-  // 6. Check the backend with a timeout
+  // 6. Check the backend with a 10-second timeout
   async function checkBackend() {
     if (!apiBaseUrl) {
       setConnectionStatus(
@@ -164,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
       } else {
         setConnectionStatus(
-          "Backend is online, but AI configuration needs checking.",
+          "Backend online, but AI configuration needs checking.",
           "CHECK CONFIG"
         );
       }
@@ -174,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
       setConnectionStatus(
         error.name === "AbortError"
           ? "Backend check timed out. Check your connection."
-          : "Could not connect. Check network or CORS settings.",
+          : "Connection failed. Check network or CORS settings.",
         "NOT CONNECTED"
       );
     } finally {
@@ -182,14 +183,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // 7. Submit a programming question
-  if (form) {
+  // 7. Submit a programming question to the AI
+  if (form && submitButton) {
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
 
       if (!apiBaseUrl) {
         showMessage(
-          "The backend URL is missing. Check api-config.js."
+          "Backend URL is missing. Check api-config.js."
         );
         setConnectionStatus("Backend URL is missing.", "NOT CONNECTED");
         return;
@@ -226,7 +227,10 @@ document.addEventListener("DOMContentLoaded", () => {
         lessonTitle.textContent = "Preparing your lesson";
       }
 
-      showMessage("Sending your question to cH Code Helper. Please wait...");
+      showMessage(
+        "Sending your question to cH Code Helper. Please wait..."
+      );
+
       setConnectionStatus("Generating your lesson...", "WORKING");
 
       const controller = new AbortController();
@@ -254,20 +258,32 @@ document.addEventListener("DOMContentLoaded", () => {
           );
         }
 
-        if (typeof data.answer !== "string" || !data.answer.trim()) {
+        if (
+          typeof data.answer !== "string" ||
+          !data.answer.trim()
+        ) {
           throw new Error("The AI returned an empty lesson. Please try again.");
         }
 
         showLesson("Your learning steps", data.answer);
-        setConnectionStatus("Your lesson was generated successfully.", "CONNECTED");
+
+        setConnectionStatus(
+          "Your lesson was generated successfully.",
+          "CONNECTED"
+        );
       } catch (error) {
         console.error("Lesson request failed:", error);
 
-        const message = error.name === "AbortError"
-          ? "The request timed out. Please try again."
-          : error.message === "Failed to fetch"
-            ? "The browser could not reach the AI service. Check your connection and backend CORS settings."
-            : error.message || "An unexpected error occurred.";
+        let message;
+
+        if (error.name === "AbortError") {
+          message = "The request timed out. Please try again.";
+        } else if (error.message === "Failed to fetch") {
+          message =
+            "Could not reach the AI service. Check your connection and CORS settings.";
+        } else {
+          message = error.message || "An unexpected error occurred.";
+        }
 
         showMessage(`Your lesson could not be generated. ${message}`);
 
@@ -275,7 +291,7 @@ document.addEventListener("DOMContentLoaded", () => {
           lessonTitle.textContent = "Let's try again";
         }
 
-        setConnectionStatus("The AI request failed. Check the error and retry.", "REQUEST FAILED");
+        setConnectionStatus("The AI request failed. Check and retry.", "REQUEST FAILED");
       } finally {
         clearTimeout(timeoutId);
         submitButton.disabled = false;
@@ -286,6 +302,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     });
+  } else {
+    console.error("Required question form or submit button is missing.");
+    setConnectionStatus(
+      "Question form not found. Check index.html.",
+      "PAGE ERROR"
+    );
   }
 
   // 8. Load a sample lesson without calling the AI
@@ -293,7 +315,7 @@ document.addEventListener("DOMContentLoaded", () => {
     sampleButton.addEventListener("click", () => {
       const sample = [
         "1. Concept",
-        "A loop repeats a block of instructions so you do not have to write the same code many times.",
+        "A loop repeats instructions so you do not have to write the same code many times.",
         "",
         "2. Logic and steps",
         "Step 1: Decide what action should repeat.",
@@ -315,7 +337,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 9. Optional animated bee cursor for pointer devices
+  // 9. Animate the bee on mouse and pen devices
   if (cursorBee) {
     document.addEventListener("pointermove", (event) => {
       if (event.pointerType === "touch") return;
@@ -333,6 +355,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 10. Start the backend check
+  // 10. Run the health check after page initialization
   checkBackend();
 });
