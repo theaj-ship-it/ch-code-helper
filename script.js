@@ -37,6 +37,14 @@ document.addEventListener("DOMContentLoaded", () => {
     lessonOutput.appendChild(paragraph);
   }
 
+  function addTextElement(parent, tag, text) {
+    const element = document.createElement(tag);
+    element.textContent = text;
+    parent.appendChild(element);
+    return element;
+  }
+
+  // Existing lesson renderer, with safe text rendering.
   function showLesson(title, answer) {
     if (!lessonOutput || !lessonTitle) return;
 
@@ -50,7 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function addCodeBlock() {
       const pre = document.createElement("pre");
       const code = document.createElement("code");
-
       code.textContent = codeLines.join("\n");
       pre.appendChild(code);
       lessonOutput.appendChild(pre);
@@ -90,7 +97,6 @@ document.addEventListener("DOMContentLoaded", () => {
         content = heading[1];
       } else {
         element = document.createElement("p");
-
         if (numbered) {
           content = `${numbered[1]} ${numbered[2]}`;
         } else if (bullet) {
@@ -113,9 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
       lessonOutput.appendChild(element);
     }
 
-    if (insideCode && codeLines.length > 0) {
-      addCodeBlock();
-    }
+    if (insideCode && codeLines.length > 0) addCodeBlock();
   }
 
   async function checkBackend() {
@@ -158,7 +162,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     } catch (error) {
       console.error("Backend health check failed:", error);
-
       setConnectionStatus(
         error.name === "AbortError"
           ? "Backend check timed out. Check your connection."
@@ -170,7 +173,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Submit a student's own programming question.
+  // Shared request helper.
+  async function postJSON(path, body, timeout = 45000) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(`${apiBaseUrl}${path}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        signal: controller.signal
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || `Request failed with HTTP ${response.status}.`
+        );
+      }
+
+      return data;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  // Normal question form remains available.
   if (form && submitButton) {
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -198,9 +228,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const language = languageSelect?.value || "Python";
       const topic = topicSelect?.value || "Other";
 
-      const fullQuestion =
-        `Topic: ${topic}\nStudent question: ${question}`;
-
       submitButton.disabled = true;
       submitButton.textContent = "Building your lesson...";
 
@@ -210,28 +237,12 @@ document.addEventListener("DOMContentLoaded", () => {
       showMessage("Sending your question to cH Code Helper. Please wait...");
       setConnectionStatus("Generating your lesson...", "WORKING");
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 45000);
-
       try {
-        const response = await fetch(`${apiBaseUrl}/api/ask`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            question: fullQuestion,
-            language,
-            level
-          }),
-          signal: controller.signal
+        const data = await postJSON("/api/ask", {
+          question: `Topic: ${topic}\nStudent question: ${question}`,
+          language,
+          level
         });
-
-        const data = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-          throw new Error(
-            data.error || `Request failed with HTTP ${response.status}.`
-          );
-        }
 
         if (typeof data.answer !== "string" || !data.answer.trim()) {
           throw new Error("The AI returned an empty lesson. Please try again.");
@@ -242,26 +253,17 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (error) {
         console.error("Lesson request failed:", error);
 
-        let message;
-
-        if (error.name === "AbortError") {
-          message = "The request timed out. Please try again.";
-        } else if (error.message === "Failed to fetch") {
-          message =
-            "Could not reach the AI service. Check your connection and CORS settings.";
-        } else {
-          message = error.message || "An unexpected error occurred.";
-        }
-
-        showMessage(`Your lesson could not be generated. ${message}`);
+        showMessage(
+          error.name === "AbortError"
+            ? "The request timed out. Please try again."
+            : `Your lesson could not be generated. ${error.message}`
+        );
 
         if (lessonTitle) lessonTitle.textContent = "Let's try again";
         setConnectionStatus("The AI request failed. Check and retry.", "REQUEST FAILED");
       } finally {
-        clearTimeout(timeoutId);
         submitButton.disabled = false;
         submitButton.textContent = "Build my learning steps →";
-
         if (ideaBulb) ideaBulb.classList.remove("is-glowing");
       }
     });
@@ -270,8 +272,104 @@ document.addEventListener("DOMContentLoaded", () => {
     setConnectionStatus("Question form not found. Check index.html.", "PAGE ERROR");
   }
 
-  // Load a sample lesson based on the selected language, level, and topic.
+  // Challenge mode: reveal two hints, then offer the solution.
+  function renderChallenge(challenge, language, level) {
+    if (!lessonOutput || !lessonTitle) return;
+
+    lessonTitle.textContent = `Challenge: ${challenge.title}`;
+    lessonOutput.replaceChildren();
+
+    addTextElement(lessonOutput, "h3", `${level} · ${language}`);
+    addTextElement(lessonOutput, "p", challenge.problem);
+
+    if (Array.isArray(challenge.requirements) && challenge.requirements.length) {
+      addTextElement(lessonOutput, "h3", "Your requirements");
+
+      const list = document.createElement("ul");
+      challenge.requirements.forEach((item) => {
+        addTextElement(list, "li", String(item));
+      });
+      lessonOutput.appendChild(list);
+    }
+
+    if (challenge.exampleInput) {
+      addTextElement(lessonOutput, "h3", "Example input");
+      addTextElement(lessonOutput, "p", challenge.exampleInput);
+    }
+
+    if (challenge.exampleOutput) {
+      addTextElement(lessonOutput, "h3", "Expected output");
+      addTextElement(lessonOutput, "p", challenge.exampleOutput);
+    }
+
+    const hintArea = document.createElement("section");
+    hintArea.className = "challenge-hints";
+    lessonOutput.appendChild(hintArea);
+
+    const hintButton = document.createElement("button");
+    hintButton.type = "button";
+    hintButton.textContent = "Reveal hint 1";
+    hintArea.appendChild(hintButton);
+
+    const revealedHints = new Set();
+
+    function revealHint(index) {
+      if (revealedHints.has(index)) return;
+      revealedHints.add(index);
+
+      const heading = document.createElement("h3");
+      heading.textContent = `Hint ${index + 1}`;
+      hintArea.insertBefore(heading, hintButton);
+
+      const hintText = document.createElement("p");
+      hintText.textContent = challenge.hints[index];
+      hintArea.insertBefore(hintText, hintButton);
+
+      if (index === 0) {
+        hintButton.textContent = "Reveal hint 2";
+      } else {
+        hintButton.remove();
+        addTextElement(
+          hintArea,
+          "p",
+          "You've tried both hints. You can now reveal the solution when you're ready."
+        );
+
+        const solutionButton = document.createElement("button");
+        solutionButton.type = "button";
+        solutionButton.textContent = "Show solution and explanation";
+        hintArea.appendChild(solutionButton);
+
+        solutionButton.addEventListener("click", () => {
+          solutionButton.disabled = true;
+          solutionButton.textContent = "Solution revealed";
+
+          addTextElement(lessonOutput, "h3", "Solution");
+
+          const pre = document.createElement("pre");
+          const code = document.createElement("code");
+          code.textContent = challenge.solution;
+          pre.appendChild(code);
+          lessonOutput.appendChild(pre);
+
+          addTextElement(lessonOutput, "h3", "How it works");
+          addTextElement(lessonOutput, "p", challenge.explanation);
+
+          addTextElement(lessonOutput, "h3", "Complexity");
+          addTextElement(lessonOutput, "p", challenge.complexity);
+        });
+      }
+    }
+
+    hintButton.addEventListener("click", () => {
+      const nextHint = revealedHints.size;
+      if (nextHint < 2) revealHint(nextHint);
+    });
+  }
+
   if (sampleButton) {
+    sampleButton.textContent = "Give me a challenge";
+
     sampleButton.addEventListener("click", async () => {
       if (!apiBaseUrl) {
         showMessage("Backend URL is missing. Check api-config.js.");
@@ -283,84 +381,63 @@ document.addEventListener("DOMContentLoaded", () => {
       const language = languageSelect?.value || "Python";
       const topic = topicSelect?.value || "Other";
 
-      const chosenTopic =
-        topic.toLowerCase() === "other" ? "loops" : topic;
-
-      const sampleQuestion =
-        `Create a sample programming lesson about ${chosenTopic} in ${language}. ` +
-        `The student level is ${level}. ` +
-        `For Beginner, explain the concept in simple English with small numbered steps. ` +
-        `For Intermediate, explain the reasoning, implementation choices, and relevant edge cases in greater depth. ` +
-        `Include a code example written in ${language}, expected output, one common mistake, ` +
-        `and a practice task with a hint. Ensure the code syntax matches ${language}. ` +
-        `This is a demonstration lesson for cH Code Helper.`;
-
-      const originalButtonText = sampleButton.textContent;
-
       sampleButton.disabled = true;
-      sampleButton.textContent = "Loading sample lesson...";
+      sampleButton.textContent = "Creating challenge...";
 
       if (ideaBulb) ideaBulb.classList.add("is-glowing");
-      if (lessonTitle) lessonTitle.textContent = "Preparing your sample lesson";
+      if (lessonTitle) lessonTitle.textContent = "Creating your challenge";
 
-      showMessage(`Creating a ${level} sample lesson in ${language} about ${chosenTopic}...`);
-      setConnectionStatus("Generating sample lesson...", "WORKING");
-
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 45000);
+      showMessage(
+        `Creating a ${level} challenge in ${language} about ${topic}...`
+      );
+      setConnectionStatus("Generating challenge...", "WORKING");
 
       try {
-        const response = await fetch(`${apiBaseUrl}/api/ask`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            question: sampleQuestion,
-            language,
-            level
-          }),
-          signal: controller.signal
+        const data = await postJSON("/api/challenge", {
+          language,
+          level,
+          topic
         });
 
-        const data = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-          throw new Error(
-            data.error || `Request failed with HTTP ${response.status}.`
-          );
+        if (!data.challenge) {
+          throw new Error("The server returned no challenge.");
         }
 
-        if (typeof data.answer !== "string" || !data.answer.trim()) {
-          throw new Error("The AI returned an empty sample lesson. Please try again.");
+        const challenge = data.challenge;
+
+        if (
+          typeof challenge.title !== "string" ||
+          typeof challenge.problem !== "string" ||
+          !Array.isArray(challenge.hints) ||
+          challenge.hints.length < 2 ||
+          typeof challenge.solution !== "string" ||
+          typeof challenge.explanation !== "string"
+        ) {
+          throw new Error("The challenge response is incomplete.");
         }
 
-        showLesson(
-          `Sample lesson: ${chosenTopic} (${language} · ${level})`,
-          data.answer
+        renderChallenge(challenge, language, level);
+        setConnectionStatus("Challenge ready. Try solving it!", "CONNECTED");
+      } catch (error) {
+        console.error("Challenge request failed:", error);
+
+        showMessage(
+          error.name === "AbortError"
+            ? "Challenge generation timed out. Please try again."
+            : `Could not create the challenge. ${error.message}`
         );
 
-        setConnectionStatus("Sample lesson generated successfully.", "CONNECTED");
-      } catch (error) {
-        console.error("Sample lesson request failed:", error);
-
-        const message = error.name === "AbortError"
-          ? "The request timed out. Please try again."
-          : error.message || "An unexpected error occurred.";
-
-        showMessage(`Could not generate the sample lesson. ${message}`);
-
         if (lessonTitle) lessonTitle.textContent = "Let's try again";
-        setConnectionStatus("Sample lesson failed. Check and retry.", "REQUEST FAILED");
+        setConnectionStatus("Challenge request failed.", "REQUEST FAILED");
       } finally {
-        clearTimeout(timeoutId);
         sampleButton.disabled = false;
-        sampleButton.textContent = originalButtonText || "Load a sample lesson";
-
+        sampleButton.textContent = "Give me a challenge";
         if (ideaBulb) ideaBulb.classList.remove("is-glowing");
       }
     });
   }
 
-  // Animate the bee on mouse and pen devices.
+  // Existing bee cursor animation.
   if (cursorBee) {
     document.addEventListener("pointermove", (event) => {
       if (event.pointerType === "touch") return;
