@@ -136,7 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ],
     Arrays: [
       { question: "For values [3, 6, 9, 12], what is the sum of elements at indexes 0 and 2?",
-        options: ["9", "12", "15", "18"], answer: 2,
+        options: ["9", "12", "15", "18"], answer: 1,
         explanation: "Index 0 contains 3 and index 2 contains 9; their sum is 12." },
       { question: "What is the result after replacing index 1 in [5, 8, 11] with 20?",
         options: ["[20, 8, 11]", "[5, 20, 11]", "[5, 8, 20]", "[20, 5, 11]"], answer: 1,
