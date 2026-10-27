@@ -134,6 +134,17 @@
       </div>
 
       <p class="practice-intro">A quick, offline mini-quiz based on your selected topic. Choose an answer to get immediate feedback, then try the next question.</p>
+      
+      <div class="practice-streak-card" aria-label="Daily practice streak">
+        <div class="streak-flame" aria-hidden="true">🔥</div>
+        <div class="streak-main">
+          <p class="streak-eyebrow">CONSISTENCY COUNTS</p>
+          <div class="streak-number-line"><strong id="practice-streak-count">0</strong><span>day streak</span></div>
+          <p id="practice-streak-status" class="streak-status" aria-live="polite">Complete one sprint today to start your streak.</p>
+        </div>
+        <div id="practice-best-streak" class="streak-best">Best: 0 days</div>
+      </div>
+
       <div class="practice-toolbar">
         <span id="practice-topic-label">Topic: Loops</span>
         <span id="practice-progress" aria-live="polite">Ready when you are</span>

@@ -466,3 +466,29 @@ footer {
   .practice-options { grid-template-columns: 1fr; }
   .practice-card { padding: 21px; border-radius: 17px; }
 }
+
+
+/* Daily consistency streak */
+.practice-streak-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 18px 0;
+  padding: 16px 18px;
+  border: 1px solid #45402f;
+  border-radius: 15px;
+  background: linear-gradient(115deg, rgba(93, 66, 23, .20), rgba(17, 18, 22, .88));
+}
+.streak-flame { font-size: 1.9rem; line-height: 1; }
+.streak-main { min-width: 0; flex: 1; }
+.streak-eyebrow { margin: 0 0 4px; color: #c6aa70; font-size: .7rem; letter-spacing: .14em; font-weight: 800; }
+.streak-number-line { display: flex; align-items: baseline; gap: 7px; }
+.streak-number-line strong { color: var(--text); font-size: 1.55rem; font-variant-numeric: tabular-nums; }
+.streak-number-line span { color: #d6d0c2; font-size: .88rem; }
+.streak-status { margin: 3px 0 0; color: var(--muted); font-size: .84rem; }
+.streak-best { flex: 0 0 auto; padding: 7px 10px; border: 1px solid #51472f; border-radius: 999px; color: #e5d4a7; font-size: .8rem; white-space: nowrap; }
+@media (max-width: 480px) {
+  .practice-streak-card { align-items: flex-start; gap: 10px; padding: 13px; }
+  .streak-flame { font-size: 1.5rem; }
+  .streak-best { font-size: .72rem; padding: 6px 8px; }
+}
