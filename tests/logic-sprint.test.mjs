@@ -29,6 +29,9 @@ test("Logic Sprint is connected to the existing page", () => {
     "practice-feedback",
     "practice-progress",
     "practice-question",
+    "practice-streak-count",
+    "practice-streak-status",
+    "practice-best-streak",
   ]) {
     assert.ok(html.includes(`id="${id}"`), `missing page element: ${id}`);
   }
@@ -132,11 +135,13 @@ test("a complete sprint handles correct answers, wrong answers, feedback, and sc
   const ids = [
     "topic", "level", "practice-topic-label", "practice-progress",
     "practice-question", "practice-options", "practice-feedback",
-    "practice-start", "practice-next",
+    "practice-start", "practice-next", "practice-streak-count", "practice-streak-status", "practice-best-streak",
   ];
   const elements = new Map(ids.map((id) => [id, new FakeElement("div", id)]));
   elements.get("topic").value = "Loops";
   elements.get("level").value = "Beginner";
+  const savedValues = new Map();
+  const windowStub = { localStorage: { getItem: (key) => savedValues.get(key) || null, setItem: (key, value) => savedValues.set(key, value) } };
   let domReady;
   const documentStub = {
     addEventListener(type, callback) {
@@ -150,13 +155,16 @@ test("a complete sprint handles correct answers, wrong answers, feedback, and sc
     },
   };
 
-  vm.runInNewContext(practiceSource, { document: documentStub });
+  vm.runInNewContext(practiceSource, { document: documentStub, window: windowStub });
   assert.equal(typeof domReady, "function", "app registers its DOM-ready callback");
   domReady();
 
   const bankMatch = practiceSource.match(/const questionBank = (\{[\s\S]*?^  \});/m);
   assert.ok(bankMatch, "question bank is available for the interaction test");
   const bank = vm.runInNewContext("(" + bankMatch[1] + ")");
+  const intermediateMatch = practiceSource.match(/const intermediateQuestionBank = (\{[\s\S]*?^  \});/m);
+  assert.ok(intermediateMatch, "intermediate question bank is available");
+  const intermediateBank = vm.runInNewContext("(" + intermediateMatch[1] + ")");
   const questionBox = elements.get("practice-question");
   const optionsBox = elements.get("practice-options");
   const feedback = elements.get("practice-feedback");
@@ -194,9 +202,45 @@ test("a complete sprint handles correct answers, wrong answers, feedback, and sc
 
   answerSprint(true);
   assert.match(questionBox.children[0].textContent, /3\/3/);
+  assert.equal(elements.get("practice-streak-count").textContent, "1", "first completed sprint starts a one-day streak");
   assert.equal(elements.get("practice-progress").textContent, "Final score: 100%");
 
   answerSprint(false);
   assert.match(questionBox.children[0].textContent, /0\/3/);
   assert.equal(elements.get("practice-progress").textContent, "Final score: 0%");
+  assert.equal(elements.get("practice-streak-count").textContent, "1", "multiple sprints on one day count as one streak day");
+  assert.equal(JSON.parse(savedValues.values().next().value).best, 1, "best streak is saved locally");
+
+  elements.get("level").value = "Intermediate";
+  start.click();
+  const intermediatePrompt = questionBox.children[0].textContent;
+  assert.ok(intermediateBank.Loops.some((question) => question.question === intermediatePrompt), "intermediate selection displays a medium question");
+});
+
+
+test("intermediate mode uses a distinct medium-difficulty bank for every topic", () => {
+  const match = practiceSource.match(/const intermediateQuestionBank = (\{[\s\S]*?^  \});/m);
+  assert.ok(match, "intermediate question bank was not found");
+  const bank = vm.runInNewContext("(" + match[1] + ")");
+  assert.deepEqual([...Object.keys(bank)].sort(), [...expectedTopics].sort());
+
+  for (const topic of expectedTopics) {
+    assert.equal(bank[topic].length, 3, topic + " should have three intermediate questions");
+    for (const [index, question] of bank[topic].entries()) {
+      assert.equal(question.options.length, 4, topic + " intermediate question " + (index + 1));
+      assert.ok(Number.isInteger(question.answer) && question.answer >= 0 && question.answer < 4);
+      assert.ok(question.explanation.trim());
+    }
+  }
+  assert.notEqual(bank.Loops[0].question, "A loop runs for i = 1, 2, 3. It adds i each time. What is the final total?");
+});
+
+test("streak UI and local-only storage are wired into the practice module", () => {
+  assert.ok(html.includes('id="practice-streak-count"'));
+  assert.ok(html.includes('id="practice-streak-status"'));
+  assert.ok(html.includes('id="practice-best-streak"'));
+  assert.match(practiceSource, /window\.localStorage\.getItem/);
+  assert.match(practiceSource, /window\.localStorage\.setItem/);
+  assert.match(practiceSource, /function recordPracticeDay\(/);
+  assert.match(css, /\.practice-streak-card/);
 });
