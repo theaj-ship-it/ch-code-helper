@@ -134,6 +134,22 @@
       </div>
 
       <p class="practice-intro">A quick, offline mini-quiz based on your selected topic. Choose an answer to get immediate feedback, then try the next question.</p>
+      <section class="streak-panel" aria-labelledby="streak-heading">
+        <div class="streak-summary">
+          <div class="streak-flame" aria-hidden="true">🔥</div>
+          <div class="streak-copy">
+            <h3 id="streak-heading">Daily learning streak</h3>
+            <p><strong id="streak-current">0 days</strong> in a row</p>
+            <p id="streak-message" aria-live="polite">Finish a Logic Sprint or log a coding challenge to start today's streak.</p>
+          </div>
+          <div class="streak-best">
+            <span>Personal best</span>
+            <strong id="streak-best">0 days</strong>
+          </div>
+        </div>
+        <div id="streak-week" class="streak-week" role="group" aria-label="Practice history for the last seven days"></div>
+        <p class="streak-footnote">Your streak is saved in this browser. Complete a full Logic Sprint or mark an attempted coding challenge as practised. Only one streak day is counted per local date.</p>
+      </section>
       <div class="practice-toolbar">
         <span id="practice-topic-label">Topic: Loops</span>
         <span id="practice-progress" aria-live="polite">Ready when you are</span>
@@ -160,6 +176,7 @@
 
   <!-- Load backend configuration before the main JavaScript -->
   <script src="api-config.js"></script>
+  <script src="streaks.js"></script>
   <script src="script.js"></script>
   <script src="practice-lab.js"></script>
 </body>
