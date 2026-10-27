@@ -123,6 +123,33 @@
         Load a sample lesson
       </button>
     </section>
+
+    <section class="practice-card" aria-labelledby="practice-title">
+      <div class="section-heading">
+        <span class="step-number" aria-hidden="true">02</span>
+        <div>
+          <h2 id="practice-title">Logic Sprint</h2>
+          <p>Practise the thinking, not just the syntax.</p>
+        </div>
+      </div>
+
+      <p class="practice-intro">A quick, offline mini-quiz based on your selected topic. Choose an answer to get immediate feedback, then try the next question.</p>
+      <div class="practice-toolbar">
+        <span id="practice-topic-label">Topic: Loops</span>
+        <span id="practice-progress" aria-live="polite">Ready when you are</span>
+      </div>
+      <div id="practice-question" class="practice-question" aria-live="polite">
+        <h3>Ready for a quick challenge?</h3>
+        <p>Start a 3-question sprint. No API key or account is needed.</p>
+      </div>
+      <div id="practice-options" class="practice-options"></div>
+      <p id="practice-feedback" class="practice-feedback" role="status" aria-live="polite"></p>
+      <div class="practice-actions">
+        <button id="practice-start" type="button">Start Logic Sprint</button>
+        <button id="practice-next" type="button" disabled>Next question →</button>
+      </div>
+      <p class="practice-footnote">Practice answers are checked in your browser. This mini-quiz does not execute submitted code.</p>
+    </section>
   </main>
 
   <footer>
