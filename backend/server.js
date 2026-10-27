@@ -3,6 +3,11 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
+import {
+  getChallengeDifficulty,
+  getChallengeDifficultyGuidance,
+  normalizeStudentLevel,
+} from "./challenge-difficulty.js";
 
 dotenv.config();
 
@@ -150,11 +155,9 @@ app.post("/api/challenge", async (req, res) => {
         ? language.trim().slice(0, 50)
         : "Python";
 
-    const safeLevel =
-      typeof level === "string" &&
-      level.toLowerCase() === "intermediate"
-        ? "Intermediate"
-        : "Beginner";
+    const safeLevel = normalizeStudentLevel(level);
+    const safeDifficulty = getChallengeDifficulty(safeLevel);
+    const difficultyGuidance = getChallengeDifficultyGuidance(safeLevel);
 
     const safeTopic =
       typeof topic === "string" && topic.trim()
@@ -170,16 +173,19 @@ Programming language: ${safeLanguage}
 Student level: ${safeLevel}
 Topic: ${safeTopic}
 
+Target challenge difficulty: ${safeDifficulty}
 Difficulty requirements:
-- Beginner: small, approachable problem; clear goal; minimal prerequisites;
-  use familiar concepts and avoid unnecessary complexity.
-- Intermediate: require reasoning and implementation choices; include
-  relevant constraints or edge cases; discuss complexity in the solution.
+- ${difficultyGuidance}
+
+Keep the difficulty matched to the selected level. Beginner must always receive Easy;
+Intermediate must always receive Medium. Do not make an Easy task depend on advanced
+concepts, and do not make a Medium task require advanced algorithms beyond this level.
 
 Return ONLY valid JSON. Do not use Markdown fences or text outside JSON.
 Use exactly this structure:
 {
   "title": "Short challenge title",
+  "difficulty": "${safeDifficulty}",
   "problem": "Clear problem statement in simple language",
   "requirements": ["Requirement one", "Requirement two"],
   "exampleInput": "Example input, or a brief description if not applicable",
@@ -248,6 +254,7 @@ The solution should solve the exact problem and address relevant edge cases.
     return res.json({
       challenge: {
         title: challenge.title,
+        difficulty: safeDifficulty,
         problem: challenge.problem,
         requirements: challenge.requirements.slice(0, 8),
         exampleInput: String(challenge.exampleInput || ""),
