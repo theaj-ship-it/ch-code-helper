@@ -180,7 +180,7 @@ test("a complete sprint handles correct answers, wrong answers, feedback, and sc
         assert.match(feedback.textContent, /^Correct!/, "correct answer shows positive feedback");
         assert.equal(feedback.classList.contains("is-correct"), true);
       } else {
-        assert.match(feedback.textContent, /^Not quite\\./, "wrong answer explains the correction");
+        assert.match(feedback.textContent, /^Not quite\./, "wrong answer explains the correction");
         assert.equal(feedback.classList.contains("is-wrong"), true);
       }
       assert.equal(next.disabled, false, "answered questions can advance");
@@ -193,10 +193,10 @@ test("a complete sprint handles correct answers, wrong answers, feedback, and sc
   }
 
   answerSprint(true);
-  assert.match(questionBox.children[0].textContent, /3\\/3/);
+  assert.match(questionBox.children[0].textContent, /3\/3/);
   assert.equal(elements.get("practice-progress").textContent, "Final score: 100%");
 
   answerSprint(false);
-  assert.match(questionBox.children[0].textContent, /0\\/3/);
+  assert.match(questionBox.children[0].textContent, /0\/3/);
   assert.equal(elements.get("practice-progress").textContent, "Final score: 0%");
 });
