@@ -466,3 +466,112 @@ footer {
   .practice-options { grid-template-columns: 1fr; }
   .practice-card { padding: 21px; border-radius: 17px; }
 }
+
+
+/* Daily learning streak tracker */
+.streak-panel {
+  margin: 20px 0 24px;
+  padding: 18px;
+  background: linear-gradient(135deg, rgba(50, 39, 24, 0.45), rgba(15, 16, 20, 0.94));
+  border: 1px solid #484035;
+  border-radius: 16px;
+}
+.streak-summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.streak-flame {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: rgba(255, 164, 66, 0.12);
+  border: 1px solid rgba(255, 164, 66, 0.28);
+  font-size: 1.45rem;
+}
+.streak-copy { min-width: 0; flex: 1; }
+.streak-copy h3 { margin: 0 0 3px; font-size: 1rem; color: var(--text); }
+.streak-copy p { margin: 3px 0 0; font-size: .82rem; color: var(--muted); }
+#streak-current { color: #ffc078; font-size: 1.1rem; }
+.streak-best {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: .75rem;
+}
+.streak-best strong { color: var(--text); font-size: .95rem; }
+.streak-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 18px;
+}
+.streak-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 2px;
+  border: 1px solid #34353c;
+  border-radius: 10px;
+  color: #8e9097;
+  background: rgba(0, 0, 0, .15);
+}
+.streak-day-label { font-size: .7rem; }
+.streak-day-marker {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: .9rem;
+  background: #202127;
+}
+.streak-day.is-complete { color: #ffd7a6; border-color: #70583e; }
+.streak-day.is-complete .streak-day-marker { color: #21160b; background: #ffbd75; font-weight: 800; }
+.streak-day.is-today { outline: 1px solid #bba17e; outline-offset: 1px; }
+.streak-footnote { margin: 13px 0 0; font-size: .75rem; color: var(--muted); }
+.challenge-difficulty-badge {
+  display: inline-flex;
+  width: fit-content;
+  margin: 12px 0;
+  padding: 5px 10px;
+  border: 1px solid #6c5d4a;
+  border-radius: 30px;
+  background: rgba(255, 188, 117, .08);
+  color: #ffd19b;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .035em;
+}
+.challenge-difficulty-badge.is-medium {
+  border-color: #6977a2;
+  color: #c6d1ff;
+  background: rgba(119, 142, 255, .08);
+}
+.challenge-completion { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); }
+.challenge-completion button {
+  padding: 10px 14px;
+  color: var(--accent-dark);
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  font-weight: 700;
+}
+.challenge-completion button:disabled { opacity: .65; cursor: default; }
+.challenge-completion p { margin: 9px 0 0; color: #a9dcb9; font-size: .85rem; }
+.streak-result-note { color: #a9dcb9; font-size: .88rem; }
+@media (max-width: 500px) {
+  .streak-panel { padding: 13px; }
+  .streak-summary { align-items: flex-start; gap: 10px; }
+  .streak-flame { width: 38px; height: 38px; }
+  .streak-best { font-size: .68rem; }
+  .streak-week { gap: 4px; }
+  .streak-day { border-radius: 8px; }
+}
