@@ -110,3 +110,12 @@ The feature is being developed on the `feature/logic-sprint-practice` branch. Th
 - The daily streak counts the first completed sprint on a local calendar day. More sprints on that day do not inflate the streak; practising on the next consecutive day increases it.
 - The current and best streak are saved in the browser's local storage on that device. No account or server-side tracking is used; clearing browser data or switching devices will reset the saved streak.
 - A streak is a consistency aid, not a penalty: a missed day resets the current streak but does not erase the best streak.
+
+
+## Tutor file attachments
+
+The lesson form supports up to three attachments per request:
+- Text and source files: `.txt`, `.md`, `.py`, `.js`, `.ts`, `.jsx`, `.tsx`, `.java`, `.c`, `.cpp`, `.h`, `.html`, `.css`, `.json`, `.csv`, `.sql`, `.xml`, `.yaml`, `.yml`, and `.log` (up to 40 KB each).
+- PDFs and PNG/JPG/WebP images (up to 5 MB each, and 7 MB combined).
+
+Text/code file contents are read in the browser; PDFs and images are encoded for the request. Attachments are sent to the backend and AI provider for analysis and are not intentionally saved by the frontend. Do not upload secrets or sensitive personal data. File attachments are optional; students should still write a question explaining what they want help with.

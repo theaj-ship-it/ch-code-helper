@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const languageSelect = document.getElementById("language");
   const topicSelect = document.getElementById("topic");
   const questionInput = document.getElementById("question");
+  const attachmentsInput = document.getElementById("attachments");
+  const attachmentList = document.getElementById("attachment-list");
 
   const submitButton = document.getElementById("submit-button");
   const sampleButton = document.getElementById("sample-button");
@@ -200,6 +202,124 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  const MAX_ATTACHMENTS = 3;
+  const MAX_TEXT_BYTES = 40 * 1024;
+  const MAX_TOTAL_BINARY_BYTES = 7 * 1024 * 1024;
+  const MAX_BINARY_FILE_BYTES = 5 * 1024 * 1024;
+  const TEXT_FILE_EXTENSIONS = new Set([
+    "txt", "md", "py", "js", "ts", "jsx", "tsx", "java", "c", "cpp",
+    "h", "html", "css", "json", "csv", "sql", "xml", "yaml", "yml", "log"
+  ]);
+  const IMAGE_MIME_BY_EXTENSION = {
+    png: "image/png",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    webp: "image/webp"
+  };
+
+  function fileExtension(filename) {
+    const parts = String(filename || "").toLowerCase().split(".");
+    return parts.length > 1 ? parts.pop() : "";
+  }
+
+  function showSelectedFiles() {
+    if (!attachmentList || !attachmentsInput) return;
+    const files = Array.from(attachmentsInput.files || []);
+    attachmentList.replaceChildren();
+
+    if (!files.length) {
+      attachmentList.textContent = "No files attached.";
+      return;
+    }
+
+    const list = document.createElement("ul");
+    list.className = "attachment-items";
+    files.forEach((file) => {
+      const item = document.createElement("li");
+      const sizeKB = Math.max(1, Math.ceil(file.size / 1024));
+      item.textContent = `${file.name} · ${sizeKB} KB`;
+      list.appendChild(item);
+    });
+    attachmentList.appendChild(list);
+  }
+
+  function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result !== "string") {
+          reject(new Error(`Could not read ${file.name}.`));
+          return;
+        }
+        const comma = reader.result.indexOf(",");
+        if (comma < 0) {
+          reject(new Error(`Could not prepare ${file.name} for upload.`));
+          return;
+        }
+        resolve(reader.result.slice(comma + 1));
+      };
+      reader.onerror = () => reject(new Error(`Could not read ${file.name}.`));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function prepareAttachments(files) {
+    if (files.length > MAX_ATTACHMENTS) {
+      throw new Error("Please attach no more than 3 files at a time.");
+    }
+
+    const prepared = [];
+    let binaryBytes = 0;
+    let textCharacters = 0;
+
+    for (const file of files) {
+      const ext = fileExtension(file.name);
+
+      if (TEXT_FILE_EXTENSIONS.has(ext)) {
+        if (file.size > MAX_TEXT_BYTES) {
+          throw new Error(`${file.name} is too large. Text and code files must be 40 KB or smaller.`);
+        }
+
+        const text = await file.text();
+        if (text.length > 40000) {
+          throw new Error(`${file.name} contains too much text. Keep each text/code file under 40,000 characters.`);
+        }
+        textCharacters += text.length;
+        if (textCharacters > 60000) {
+          throw new Error("Please keep the combined text/code attachments under 60,000 characters.");
+        }
+
+        prepared.push({ name: file.name, kind: "text", text });
+        continue;
+      }
+
+      const mimeType = ext === "pdf"
+        ? "application/pdf"
+        : IMAGE_MIME_BY_EXTENSION[ext];
+
+      if (!mimeType) {
+        throw new Error(`${file.name} is not a supported file type. Choose a code/text file, PDF, PNG, JPG, or WebP image.`);
+      }
+      if (file.size > MAX_BINARY_FILE_BYTES) {
+        throw new Error(`${file.name} is too large. PDFs and images must be 5 MB or smaller.`);
+      }
+
+      binaryBytes += file.size;
+      if (binaryBytes > MAX_TOTAL_BINARY_BYTES) {
+        throw new Error("Please keep the combined PDF/image attachments under 7 MB.");
+      }
+
+      const data = await readFileAsBase64(file);
+      prepared.push({ name: file.name, kind: "binary", mimeType, data });
+    }
+
+    return prepared;
+  }
+
+  if (attachmentsInput) {
+    attachmentsInput.addEventListener("change", showSelectedFiles);
+  }
+
   // Normal question form remains available.
   if (form && submitButton) {
     form.addEventListener("submit", async (event) => {
@@ -228,27 +348,44 @@ document.addEventListener("DOMContentLoaded", () => {
       const language = languageSelect?.value || "Python";
       const topic = topicSelect?.value || "Other";
 
+      let attachments = [];
+      try {
+        attachments = await prepareAttachments(Array.from(attachmentsInput?.files || []));
+      } catch (error) {
+        showMessage(error.message);
+        return;
+      }
+
       submitButton.disabled = true;
       submitButton.textContent = "Building your lesson...";
 
       if (ideaBulb) ideaBulb.classList.add("is-glowing");
       if (lessonTitle) lessonTitle.textContent = "Preparing your lesson";
 
-      showMessage("Sending your question to cH Code Helper. Please wait...");
+      showMessage(
+        attachments.length
+          ? `Sending your question and ${attachments.length} attachment(s) to cH Code Helper. Please wait...`
+          : "Sending your question to cH Code Helper. Please wait..."
+      );
       setConnectionStatus("Generating your lesson...", "WORKING");
 
       try {
         const data = await postJSON("/api/ask", {
           question: `Topic: ${topic}\nStudent question: ${question}`,
           language,
-          level
-        });
+          level,
+          attachments
+        }, attachments.length ? 90000 : 45000);
 
         if (typeof data.answer !== "string" || !data.answer.trim()) {
           throw new Error("The AI returned an empty lesson. Please try again.");
         }
 
         showLesson("Your learning steps", data.answer);
+        if (attachmentsInput) {
+          attachmentsInput.value = "";
+          showSelectedFiles();
+        }
         setConnectionStatus("Your lesson was generated successfully.", "CONNECTED");
       } catch (error) {
         console.error("Lesson request failed:", error);
