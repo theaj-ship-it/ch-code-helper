@@ -102,3 +102,11 @@ The **Logic Sprint** panel adds a small, browser-based practice round alongside 
 - Runs locally in the browser and does not call the AI API or execute submitted code.
 
 The feature is being developed on the `feature/logic-sprint-practice` branch. The existing lesson form and backend endpoints are left unchanged.
+
+
+## Logic Sprint: levels and daily streaks
+
+- **Beginner** uses the easy practice bank; **Intermediate** uses a separate medium-difficulty bank. Each of the nine topics has three questions at each level.
+- The daily streak counts the first completed sprint on a local calendar day. More sprints on that day do not inflate the streak; practising on the next consecutive day increases it.
+- The current and best streak are saved in the browser's local storage on that device. No account or server-side tracking is used; clearing browser data or switching devices will reset the saved streak.
+- A streak is a consistency aid, not a penalty: a missed day resets the current streak but does not erase the best streak.
