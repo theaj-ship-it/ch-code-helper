@@ -279,7 +279,16 @@ document.addEventListener("DOMContentLoaded", () => {
     lessonTitle.textContent = `Challenge: ${challenge.title}`;
     lessonOutput.replaceChildren();
 
-    addTextElement(lessonOutput, "h3", `${level} · ${language}`);
+    const difficulty = challenge.difficulty === "Medium" || level === "Intermediate"
+      ? "Medium"
+      : "Easy";
+    const difficultyBadge = addTextElement(
+      lessonOutput,
+      "p",
+      difficulty + " · " + level + " · " + language
+    );
+    difficultyBadge.className = "challenge-difficulty-badge " +
+      (difficulty === "Medium" ? "is-medium" : "is-easy");
     addTextElement(lessonOutput, "p", challenge.problem);
 
     if (Array.isArray(challenge.requirements) && challenge.requirements.length) {
@@ -357,6 +366,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
           addTextElement(lessonOutput, "h3", "Complexity");
           addTextElement(lessonOutput, "p", challenge.complexity);
+
+          const completionArea = document.createElement("div");
+          completionArea.className = "challenge-completion";
+          const completionButton = document.createElement("button");
+          completionButton.type = "button";
+          completionButton.textContent = "I practised this challenge — log today's streak";
+          completionArea.appendChild(completionButton);
+          lessonOutput.appendChild(completionArea);
+
+          completionButton.addEventListener("click", () => {
+            const streakResult = window.CH_STREAKS?.recordPractice("Coding challenge");
+            if (!streakResult) {
+              completionButton.textContent = "Streak tracker unavailable";
+              return;
+            }
+
+            completionButton.disabled = true;
+            completionButton.textContent = streakResult.alreadyCounted
+              ? "Today's practice is already counted"
+              : "Practice logged for today ✓";
+
+            const note = addTextElement(
+              completionArea,
+              "p",
+              streakResult.alreadyCounted
+                ? "You've already earned today's streak. Come back tomorrow to keep it going."
+                : "Nice consistency. Your current streak is " + streakResult.currentStreak +
+                  " " + (streakResult.currentStreak === 1 ? "day." : "days.")
+            );
+            if (streakResult.saved === false) {
+              note.textContent += " Browser storage is unavailable, so this may not persist after this session.";
+            }
+          });
         });
       }
     }
@@ -387,8 +429,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (ideaBulb) ideaBulb.classList.add("is-glowing");
       if (lessonTitle) lessonTitle.textContent = "Creating your challenge";
 
+      const difficulty = level === "Intermediate" ? "Medium" : "Easy";
       showMessage(
-        `Creating a ${level} challenge in ${language} about ${topic}...`
+        "Creating an " + difficulty + " challenge for " + level +
+          " in " + language + " about " + topic + "..."
       );
       setConnectionStatus("Generating challenge...", "WORKING");
 
