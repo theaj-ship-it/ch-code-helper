@@ -89,3 +89,16 @@ Check `http://localhost:3000/health`. For local browser testing, set `CORS_ORIGI
 
 - OpenAI API documentation: https://platform.openai.com/docs/api-reference/responses
 - OpenAI model documentation: https://platform.openai.com/docs/models
+
+
+## Logic Sprint (new practice feature)
+
+The **Logic Sprint** panel adds a small, browser-based practice round alongside the existing AI tutor:
+
+- Three multiple-choice questions for the selected topic.
+- Instant correct/incorrect feedback with explanations.
+- Score tracking, next-question flow, and restart support.
+- Topic coverage for loops, arrays, variables, functions, conditions, OOP, data structures, algorithms, and general problem-solving.
+- Runs locally in the browser and does not call the AI API or execute submitted code.
+
+The feature is being developed on the `feature/logic-sprint-practice` branch. The existing lesson form and backend endpoints are left unchanged.
