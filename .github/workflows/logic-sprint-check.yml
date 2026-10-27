@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  syntax-check:
+  syntax-and-data-checks:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -18,5 +18,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Check practice module syntax
-        run: node --check practice-lab.js
+      - name: Check JavaScript syntax
+        run: |
+          node --check script.js
+          node --check practice-lab.js
+          node --check tests/logic-sprint.test.mjs
+      - name: Test Logic Sprint integration and question data
+        run: node --test tests/logic-sprint.test.mjs
