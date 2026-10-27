@@ -399,3 +399,70 @@ footer {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* Offline Logic Sprint practice feature */
+.practice-card {
+  grid-column: 1 / -1;
+  min-width: 0;
+  padding: clamp(20px, 3vw, 32px);
+  background: rgba(17, 18, 22, 0.92);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.18);
+}
+.practice-intro, .practice-footnote { color: var(--muted); }
+.practice-toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 18px 0;
+  color: #c5c2b9;
+  font-size: .88rem;
+}
+.practice-question {
+  padding: 18px;
+  background: #0b0c0f;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+.practice-question h3 { margin: 0 0 8px; color: var(--text); }
+.practice-question p { margin: 0; color: #d3d3d7; }
+.practice-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+.practice-option {
+  padding: 13px 15px;
+  text-align: left;
+  color: var(--text);
+  background: #17181d;
+  border: 1px solid #3a3b43;
+  border-radius: 11px;
+  cursor: pointer;
+}
+.practice-option:hover:not(:disabled), .practice-option:focus-visible {
+  border-color: #b8b4a6;
+  outline: 2px solid transparent;
+}
+.practice-option:disabled { cursor: default; opacity: .82; }
+.practice-option.is-correct { border-color: #65b98a; background: #10251b; }
+.practice-option.is-wrong { border-color: #c97878; background: #2a1719; }
+.practice-feedback { min-height: 1.5em; margin: 14px 0; color: #d3d3d7; }
+.practice-feedback.is-correct { color: #8ed5a8; }
+.practice-feedback.is-wrong { color: #f0a3a3; }
+.practice-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.practice-actions button {
+  padding: 12px 16px;
+  color: var(--accent-dark);
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.practice-actions button:disabled { opacity: .45; cursor: not-allowed; }
+.practice-actions #practice-next { color: var(--text); background: transparent; border-color: #484950; }
+.practice-footnote { font-size: .82rem; margin-bottom: 0; }
+@media (max-width: 600px) {
+  .practice-options { grid-template-columns: 1fr; }
+  .practice-card { padding: 21px; border-radius: 17px; }
+}
