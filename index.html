@@ -81,6 +81,20 @@
           Ask about a concept, an example, or how to begin solving a programming problem.
         </p>
 
+        <label for="attachments">Attach files (optional)</label>
+        <input
+          id="attachments"
+          name="attachments"
+          type="file"
+          multiple
+          accept=".txt,.md,.py,.js,.ts,.jsx,.tsx,.java,.c,.cpp,.h,.html,.css,.json,.csv,.sql,.xml,.yaml,.yml,.log,.pdf,.png,.jpg,.jpeg,.webp"
+          aria-describedby="attachment-help"
+        >
+        <p class="helper-text" id="attachment-help">
+          Attach up to 3 code/text files, PDFs, or PNG/JPG/WebP images. Each file must be 5 MB or smaller; text/code files may be up to 40 KB.
+        </p>
+        <p id="attachment-list" class="attachment-list" aria-live="polite">No files attached.</p>
+
         <button id="submit-button" type="submit">
           Build my learning steps →
         </button>
