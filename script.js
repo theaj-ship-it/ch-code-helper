@@ -366,15 +366,21 @@ document.addEventListener("DOMContentLoaded", () => {
       const language = languageSelect?.value || "Python";
       const topic = topicSelect?.value || "Other";
 
+      // Lock the submit action before reading files so slow mobile storage cannot trigger duplicate requests.
+      submitButton.disabled = true;
+      submitButton.textContent = "Preparing attachments...";
+
       let attachments = [];
       try {
         attachments = await prepareAttachments(Array.from(attachmentsInput?.files || []));
       } catch (error) {
         showMessage(error.message);
+        setConnectionStatus("Check the selected attachments and try again.", "CHECK INPUT");
+        submitButton.disabled = false;
+        submitButton.textContent = "Build my learning steps →";
         return;
       }
 
-      submitButton.disabled = true;
       submitButton.textContent = "Building your lesson...";
 
       if (ideaBulb) ideaBulb.classList.add("is-glowing");
