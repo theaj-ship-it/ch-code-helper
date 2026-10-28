@@ -20,6 +20,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const ideaBulb = document.getElementById("idea-bulb");
   const cursorBee = document.getElementById("cursor-bee");
+  const ambientVideo = document.querySelector(".ambient-video");
+
+  // Keep the animated MP4 off small/touch devices; the SVG remains as a static fallback.
+  if (ambientVideo) {
+    const smallOrTouch = window.matchMedia("(max-width: 760px), (pointer: coarse)").matches;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (smallOrTouch || reducedMotion) {
+      ambientVideo.pause();
+      ambientVideo.removeAttribute("src");
+      ambientVideo.querySelectorAll("source").forEach((source) => source.removeAttribute("src"));
+      ambientVideo.load();
+    } else {
+      ambientVideo.play().catch(() => {
+        // Video is decorative; the SVG fallback is sufficient if playback is unavailable.
+      });
+    }
+  }
 
   const apiBaseUrl = String(
     window.CH_CONFIG?.API_BASE_URL || ""
@@ -136,7 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setConnectionStatus("Connecting to backend...", "CHECKING");
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const timeoutId = setTimeout(() => controller.abort(), 75000);
 
     try {
       const response = await fetch(`${apiBaseUrl}/health`, {
@@ -166,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Backend health check failed:", error);
       setConnectionStatus(
         error.name === "AbortError"
-          ? "Backend check timed out. Check your connection."
+          ? "The backend is taking longer to wake up. You can still submit; the first request may take a little longer."
           : "Connection failed. Check network or CORS settings.",
         "NOT CONNECTED"
       );
@@ -176,7 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Shared request helper.
-  async function postJSON(path, body, timeout = 45000) {
+  async function postJSON(path, body, timeout = 150000) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -375,7 +393,7 @@ document.addEventListener("DOMContentLoaded", () => {
           language,
           level,
           attachments
-        }, attachments.length ? 90000 : 45000);
+        }, attachments.length ? 180000 : 150000);
 
         if (typeof data.answer !== "string" || !data.answer.trim()) {
           throw new Error("The AI returned an empty lesson. Please try again.");
@@ -560,7 +578,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         showMessage(
           error.name === "AbortError"
-            ? "Challenge generation timed out. Please try again."
+            ? "Challenge generation took longer than expected and timed out. Check your connection, then retry."
             : `Could not create the challenge. ${error.message}`
         );
 
