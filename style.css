@@ -623,12 +623,12 @@ body > :not(.ambient-background) {
   height: 100%;
   object-fit: cover;
   object-position: center;
-  opacity: .78;
+  opacity: .46;
   filter: saturate(1.08) contrast(1.04);
 }
 .ambient-background::after { z-index: 1; }
 @media (max-width: 760px) {
-  .ambient-video { object-position: center; opacity: .58; }
+  .ambient-video { object-position: center; opacity: .34; }
 }
 @media (prefers-reduced-motion: reduce) {
   .ambient-video { display: none; }
