@@ -686,3 +686,41 @@ body > :not(.ambient-background) {
     word-break: break-word;
   }
 }
+
+
+/* Responsive holographic background framing for laptop and Android screens.
+   Keep the globe centered on portrait phones and use the wider composition on laptops. */
+.ambient-background {
+  background-position: center center;
+  background-size: cover;
+}
+
+@media (max-width: 760px), (pointer: coarse) {
+  .ambient-background {
+    background-position: 50% 50%;
+    background-size: cover;
+    opacity: .42;
+  }
+
+  .ambient-background::after {
+    background:
+      linear-gradient(180deg, rgba(3, 7, 13, .42), rgba(3, 7, 13, .72)),
+      radial-gradient(ellipse at center, transparent 8%, rgba(3, 7, 13, .3) 100%);
+  }
+}
+
+/* Portrait Android: prioritize the central globe when the sides are cropped. */
+@media (max-width: 760px) and (orientation: portrait) {
+  .ambient-background {
+    background-position: 50% 50%;
+    background-size: cover;
+  }
+}
+
+/* Laptop and landscape screens: retain the full-width scene. */
+@media (min-width: 761px), (orientation: landscape) and (min-width: 500px) {
+  .ambient-background {
+    background-position: center center;
+    background-size: cover;
+  }
+}
