@@ -66,6 +66,10 @@ Open [AgentReach_Needle3_Phase2_GoogleDrive.ipynb](https://colab.research.google
 
 Google authorization can give notebook code access to account data beyond what one tool function uses. Review the notebook and authorization prompt before approving. Do not execute untrusted code in the same authenticated session. This phase deliberately avoids Drive writes and content reads.
 
+### Create the AgentReach test Google Doc
+
+Open [AgentReach_Create_Test_GoogleDoc.ipynb](https://colab.research.google.com/github/theaj-ship-it/ch-code-helper/blob/feature/agentreach-needle3-prototype/agentreach/AgentReach_Create_Test_GoogleDoc.ipynb) and run the cells in order. The notebook verifies that the signed-in Google account is `thec7135@gmail.com` before creating anything. It searches only for the exact title `AgentReach Test Document`, avoids creating duplicates, and inserts the sample sentence only when creating a new document. It does not list other Drive files. If the requested account cannot be verified, creation stops.
+
 ### Phase 3 safe test: exact-title document only
 
 Prefer [AgentReach_Needle3_Phase3_SafeTest.ipynb](https://colab.research.google.com/github/theaj-ship-it/ch-code-helper/blob/feature/agentreach-needle3-prototype/agentreach/AgentReach_Needle3_Phase3_SafeTest.ipynb) over the general selected-document notebook for the first live read test. It searches for the exact title `AgentReach Test Document` only, so it does not print unrelated personal file names. Create a non-sensitive Google Doc with that exact title and sample text, choose one matching result, and approve reading with `READ TEST DOCUMENT`. The content preview is capped at 5,000 characters. The notebook contains no write or delete operations.
