@@ -72,7 +72,7 @@ Open [AgentReach_Create_Test_GoogleDoc.ipynb](https://colab.research.google.com/
 
 ### Phase 3 safe test: exact-title document only
 
-Prefer [AgentReach_Needle3_Phase3_SafeTest.ipynb](https://colab.research.google.com/github/theaj-ship-it/ch-code-helper/blob/feature/agentreach-needle3-prototype/agentreach/AgentReach_Needle3_Phase3_SafeTest.ipynb) over the general selected-document notebook for the first live read test. It searches for the exact title `AgentReach Test Document` only, so it does not print unrelated personal file names. Create a non-sensitive Google Doc with that exact title and sample text, choose one matching result, and approve reading with `READ TEST DOCUMENT`. The content preview is capped at 5,000 characters. The notebook contains no write or delete operations.
+Prefer [AgentReach_Needle3_Phase3_SafeTest.ipynb](https://colab.research.google.com/github/theaj-ship-it/ch-code-helper/blob/feature/agentreach-needle3-prototype/agentreach/AgentReach_Needle3_Phase3_SafeTest.ipynb) over the general selected-document notebook for the first live read test. It searches for the exact title `AgentReach Test Document` only, so it does not print unrelated personal file names. It proceeds only when exactly one native Google Doc matches that title; the notebook then automatically approves that single exact-title match for this test. There is no interactive selection or confirmation phrase in this notebook. The content preview is capped at 5,000 characters. The notebook contains no write or delete operations.
 
 ### Phase 3: Preview one explicitly approved Google Doc
 
