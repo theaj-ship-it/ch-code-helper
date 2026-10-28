@@ -54,6 +54,18 @@ The GitHub lookup uses the public GitHub API and does not need a token for publi
 - This prototype does not claim to connect Gmail, Google Drive, Calendar, or all apps automatically.
 - The root cH Code Helper website and its backend are unchanged by this branch.
 
+## Google Colab prototypes
+
+### Phase 1: Needle 3 smoke test
+
+Open [AgentReach_Needle3_Colab.ipynb](https://colab.research.google.com/github/theaj-ship-it/ch-code-helper/blob/feature/agentreach-needle3-prototype/agentreach/AgentReach_Needle3_Colab.ipynb) and run the cells from top to bottom. It tests package setup, the public GitHub API, Needle initialization, and tool calling.
+
+### Phase 2: Google Drive filename search (read-only)
+
+Open [AgentReach_Needle3_Phase2_GoogleDrive.ipynb](https://colab.research.google.com/github/theaj-ship-it/ch-code-helper/blob/feature/agentreach-needle3-prototype/agentreach/AgentReach_Needle3_Phase2_GoogleDrive.ipynb) and run the cells in order. The notebook asks the user to authorize Google access in Colab and then enables a limited Drive tool that searches a filename substring and returns at most ten metadata records. It does not read file contents or perform writes.
+
+Google authorization can give notebook code access to account data beyond what one tool function uses. Review the notebook and authorization prompt before approving. Do not execute untrusted code in the same authenticated session. This phase deliberately avoids Drive writes and content reads.
+
 ## Next milestones
 
 1. Run the local prototype and verify Needle 3 loads.
