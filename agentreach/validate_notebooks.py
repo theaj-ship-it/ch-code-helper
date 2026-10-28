@@ -59,6 +59,24 @@ if safe_path.exists():
         if forbidden in code:
             errors.append(f"Phase 3 Safe Test: unexpected write operation {forbidden}")
 
+
+    direct_cell = next((cell for cell in safe_nb.get("cells", []) if cell.get("id") == "direct-test"), {})
+    direct_source = "".join(direct_cell.get("source", []))
+    agent_cell = next((cell for cell in safe_nb.get("cells", []) if cell.get("id") == "agent-test"), {})
+    agent_source = "".join(agent_cell.get("source", []))
+    tool_cell = next((cell for cell in safe_nb.get("cells", []) if cell.get("id") == "define-tool"), {})
+    tool_source = "".join(tool_cell.get("source", []))
+    if "EXPECTED_SAMPLE_TEXT in direct_result.get('preview', '')" not in direct_source:
+        errors.append("Phase 3 Safe Test: direct read must assert expected sample text")
+    if "direct_result.get('ok') is True" not in direct_source:
+        errors.append("Phase 3 Safe Test: direct read success assertion missing")
+    if "TOOL_CALL_COUNT += 1" not in tool_source:
+        errors.append("Phase 3 Safe Test: actual tool invocation counter missing")
+    if "TOOL_CALL_COUNT > calls_before" not in agent_source:
+        errors.append("Phase 3 Safe Test: Needle tool invocation assertion missing")
+    if "EXPECTED_SAMPLE_TEXT in serialized_result" not in agent_source:
+        errors.append("Phase 3 Safe Test: Needle expected-text assertion missing")
+
 if errors:
     print("AgentReach notebook validation: FAILED")
     for error in errors:
