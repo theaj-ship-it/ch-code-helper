@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    setConnectionStatus("Connecting to backend...", "CHECKING");
+    setConnectionStatus("Connecting to backend; the first check may take longer after inactivity...", "CHECKING");
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 75000);
@@ -382,8 +382,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       showMessage(
         attachments.length
-          ? `Sending your question and ${attachments.length} attachment(s) to cH Code Helper. Please wait...`
-          : "Sending your question to cH Code Helper. Please wait..."
+          ? `Sending your question and ${attachments.length} attachment(s). If the backend was idle, its first response can take longer; keep this page open.`
+          : "Sending your question. If the backend was idle, its first response can take longer; keep this page open."
       );
       setConnectionStatus("Generating your lesson...", "WORKING");
 
@@ -410,7 +410,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         showMessage(
           error.name === "AbortError"
-            ? "The request timed out. Please try again."
+            ? "The lesson took too long to return. Check your connection and retry; a backend wake-up plus AI generation can take longer than usual."
             : `Your lesson could not be generated. ${error.message}`
         );
 
@@ -543,7 +543,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (lessonTitle) lessonTitle.textContent = "Creating your challenge";
 
       showMessage(
-        `Creating a ${level} challenge in ${language} about ${topic}...`
+        `Creating a ${level} challenge in ${language} about ${topic}. The first request after backend inactivity may take longer...`
       );
       setConnectionStatus("Generating challenge...", "WORKING");
 
