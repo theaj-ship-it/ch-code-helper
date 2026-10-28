@@ -66,6 +66,12 @@ Open [AgentReach_Needle3_Phase2_GoogleDrive.ipynb](https://colab.research.google
 
 Google authorization can give notebook code access to account data beyond what one tool function uses. Review the notebook and authorization prompt before approving. Do not execute untrusted code in the same authenticated session. This phase deliberately avoids Drive writes and content reads.
 
+### Phase 3: Preview one explicitly approved Google Doc
+
+Open [AgentReach_Needle3_Phase3_SelectedDoc.ipynb](https://colab.research.google.com/github/theaj-ship-it/ch-code-helper/blob/feature/agentreach-needle3-prototype/agentreach/AgentReach_Needle3_Phase3_SelectedDoc.ipynb) after Phase 2. It lists recent Google Docs by metadata, asks the user to choose one listed file ID, then requires the exact confirmation phrase `READ THIS DOCUMENT` before reading. The Needle tool verifies that ID against the approved selection and returns at most 5,000 characters of exported plain text. It does not modify or share files.
+
+Choose only a document whose contents you are comfortable previewing in notebook output. Google authorization may grant notebook code broader access than the individual tool function uses; review the notebook and Google's consent prompt before authorizing. This phase is intended for a non-sensitive test document.
+
 ## Next milestones
 
 1. Run the local prototype and verify Needle 3 loads.
