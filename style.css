@@ -612,3 +612,24 @@ body > :not(.ambient-background) {
 .attachment-items li {
   margin: 4px 0;
 }
+
+
+/* MP4 holographic globe background. SVG remains as a resilient poster/fallback. */
+.ambient-background { background-color: #03070d; }
+.ambient-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: .78;
+  filter: saturate(1.08) contrast(1.04);
+}
+.ambient-background::after { z-index: 1; }
+@media (max-width: 760px) {
+  .ambient-video { object-position: center; opacity: .58; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ambient-video { display: none; }
+}
