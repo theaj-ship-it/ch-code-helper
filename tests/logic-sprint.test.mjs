@@ -138,13 +138,14 @@ test("a complete sprint handles correct answers, wrong answers, feedback, and sc
   }
 
   const ids = [
-    "topic", "level", "practice-topic-label", "practice-progress",
+    "topic", "level", "language", "practice-topic-label", "practice-progress",
     "practice-question", "practice-options", "practice-feedback",
     "practice-start", "practice-next", "practice-streak-count", "practice-streak-status", "practice-best-streak",
   ];
   const elements = new Map(ids.map((id) => [id, new FakeElement("div", id)]));
   elements.get("topic").value = "Loops";
   elements.get("level").value = "Beginner";
+  elements.get("language").value = "Python";
   const savedValues = new Map();
   const windowStub = { localStorage: { getItem: (key) => savedValues.get(key) || null, setItem: (key, value) => savedValues.set(key, value) } };
   let domReady;
