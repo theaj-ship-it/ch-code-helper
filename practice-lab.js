@@ -362,7 +362,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return makeItem("Assignments run top to bottom and use the latest values. What is the final pair?", code, answer,
         ["x = " + x + ", y = " + y, "x = " + (x + y) + ", y = " + (x + y),
           "x = " + (x + y) + ", y = " + (x + 2 * y)],
-        "After x += y, x is " + (x + y) + ". Then y becomes " + (x + 2 * y). Finally x becomes y - the updated x, so x is " + y + ".", random);
+        "After x += y, x is " + (x + y) + ". Then y becomes " + (x + 2 * y) + ". Finally x becomes y - the updated x, so x is " + y + ".", random);
     }
 
     if (topic === "Functions") {
