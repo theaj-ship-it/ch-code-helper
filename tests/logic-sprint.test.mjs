@@ -232,7 +232,7 @@ test("a complete sprint handles correct answers, wrong answers, feedback, and sc
 
 test("Creator Launch Kit has five working platform workflows and valid JavaScript", () => {
   assert.ok(html.includes('href="launch-kit.html"'), "main page links to the Creator Launch Kit");
-  const scriptMatch = launchHtml.match(/<script>([\\s\\S]*?)<\\/script>/);
+  const scriptMatch = launchHtml.match(/<script>([\s\S]*?)<\/script>/);
   assert.ok(scriptMatch, "launch-kit script is present");
   assert.doesNotThrow(() => new vm.Script(scriptMatch[1]), "launch-kit JavaScript parses");
   for (const platform of ["reddit", "hackernews", "producthunt", "indiehackers", "uneed"]) {
@@ -241,10 +241,10 @@ test("Creator Launch Kit has five working platform workflows and valid JavaScrip
   for (const id of ["launch-date", "platform-grid", "launch-checklist", "export-plan", "reset-plan", "save-status"]) {
     assert.ok(launchHtml.includes('id="' + id + '"'), "missing launch-kit control: " + id);
   }
-  assert.match(scriptMatch[1], /localStorage\\.setItem/);
-  assert.match(scriptMatch[1], /navigator\\.clipboard/);
+  assert.match(scriptMatch[1], /localStorage\.setItem/);
+  assert.match(scriptMatch[1], /navigator\.clipboard/);
   assert.match(scriptMatch[1], /new Blob/);
-  assert.doesNotMatch(scriptMatch[1], /\\bfetch\\s*\\(|XMLHttpRequest|WebSocket/,
+  assert.doesNotMatch(scriptMatch[1], /\bfetch\s*\(|XMLHttpRequest|WebSocket/,
     "launch-kit should not pretend to publish posts or fetch live metrics");
 });
 
