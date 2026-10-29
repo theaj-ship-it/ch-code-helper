@@ -207,7 +207,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (language === "Python") return "print(" + expression + ")";
     if (language === "JavaScript") return "console.log(" + expression + ");";
     if (language === "Java") return "System.out.println(" + expression + ");";
-    if (language === "C") return "printf(\"%d\\\n\", " + expression + ");";
+    if (language === "C") return "printf(\"%d\\n\", " + expression + ");";
     return "cout << " + expression + " << endl;";
   }
 
@@ -319,7 +319,7 @@ document.addEventListener("DOMContentLoaded", function () {
           declareInt(language, "length", sample.length) + "\n" +
           "for (" + (language === "JavaScript" ? "let " : "int ") + "i = 0; i <= length; i += 1) { " +
           (language === "JavaScript" ? "console.log(values[i]);" : language === "Java" ? "System.out.println(values[i]);" :
-            language === "C" ? "printf(\"%d\\\n\", values[i]);" : "cout << values[i] << endl;") + " }";
+            language === "C" ? "printf(\"%d\\n\", values[i]);" : "cout << values[i] << endl;") + " }";
       }
       return makeItem("The array has three elements. What defect will appear at the end of this loop?", code,
         "The loop tries to access index 3, which is outside the array.",
@@ -396,7 +396,7 @@ document.addEventListener("DOMContentLoaded", function () {
       } else {
         code = "int threshold = " + threshold + ";\nint score(int value) { if (value > threshold) { return 2; } return 1; }\n" +
           (language === "Java" ? "System.out.println(score(threshold));" :
-            language === "C" ? "printf(\"%d\\\n\", score(threshold));" : "cout << score(threshold) << endl;");
+            language === "C" ? "printf(\"%d\\n\", score(threshold));" : "cout << score(threshold) << endl;");
       }
       return makeItem("The input equals threshold exactly. Which return value is produced?", code, 1,
         [0, 2, threshold],
@@ -445,8 +445,9 @@ document.addEventListener("DOMContentLoaded", function () {
         code = "value = " + value + "\nif value % " + divisor + " == 0:\n    result = 10\nelse:\n    result = 20\nprint(result)";
       } else {
         code = declareInt(language, "value", value) + "\n" +
+          declareInt(language, "result", 0) + "\n" +
           "if (value % " + divisor + " == 0) { result = 10; } else { result = 20; }\n" +
-          declareInt(language, "result", 0) + "\n" + printLine(language, "result");
+          printLine(language, "result");
       }
       return makeItem("The code checks whether value is divisible by " + divisor + ". What is printed?", code, resultValue,
         [resultValue === 10 ? 20 : 10, value, divisor],
@@ -469,7 +470,7 @@ document.addEventListener("DOMContentLoaded", function () {
           code = "struct Parent { virtual int value() { return 1; } };\nstruct Child : Parent { int value() override { return " +
             childValue + "; } };\nChild item;\ncout << item.value() << endl;";
         } else {
-          code = "struct Item { int value; };\nstruct Item item = {" + childValue + "};\nprintf(\"%d\\\n\", item.value);";
+          code = "struct Item { int value; };\nstruct Item item = {" + childValue + "};\nprintf(\"%d\\n\", item.value);";
         }
         return makeItem("Follow the object's actual type. What number is printed by the method or field read?", code, childValue,
           [1, childValue + 1, childValue * 2],
@@ -490,7 +491,7 @@ document.addEventListener("DOMContentLoaded", function () {
             startingCoins + ");\nwallet.add(" + addedCoins + ");\nSystem.out.println(wallet.count());";
         } else if (language === "C") {
           code = "struct Wallet { int coins; };\nvoid add(struct Wallet *wallet, int amount) { if (amount > 0) wallet->coins += amount; }\nstruct Wallet wallet = {" +
-            startingCoins + "};\nadd(&wallet, " + addedCoins + ");\nprintf(\"%d\\\n\", wallet.coins);";
+            startingCoins + "};\nadd(&wallet, " + addedCoins + ");\nprintf(\"%d\\n\", wallet.coins);";
         } else {
           code = "class Wallet { int coins; public: Wallet(int value) : coins(value) {} void add(int amount) { if (amount > 0) coins += amount; } int count() { return coins; } };\nWallet wallet(" +
             startingCoins + ");\nwallet.add(" + addedCoins + ");\ncout << wallet.count() << endl;";
@@ -514,7 +515,7 @@ document.addEventListener("DOMContentLoaded", function () {
           ");\nBox second = new Box(" + second + ");\nfirst.value += " + delta + ";\nSystem.out.println(second.value);";
       } else if (language === "C") {
         code = "struct Box { int value; };\nstruct Box first = {" + first + "};\nstruct Box second = {" + second +
-          "};\nfirst.value += " + delta + ";\nprintf(\"%d\\\n\", second.value);";
+          "};\nfirst.value += " + delta + ";\nprintf(\"%d\\n\", second.value);";
       } else {
         code = "struct Box { int value; };\nBox first{" + first + "};\nBox second{" + second +
           "};\nfirst.value += " + delta + ";\ncout << second.value << endl;";
@@ -575,7 +576,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       return makeItem("Several items are removed from the top. Which value is now at the top?", code, answer,
         [values[0], values[3], values[4]],
-        "After two pops, the last two values are gone. The remaining top value is " + answer + ".", random);
+        "After removing " + popCount + " items, the remaining top value is " + answer + ".", random);
     }
 
     if (topic === "Algorithms") {
@@ -656,8 +657,8 @@ document.addEventListener("DOMContentLoaded", function () {
       } else if (language === "Java") {
         code = "int average(int[] values) {\n  int total = 0;\n  for (int value : values) { total += value; }\n  return total / values.length;\n}\nint[] values = new int[0];\nSystem.out.println(average(values));";
       } else {
-        code = "int average(int values[], int length) {\n  int total = 0;\n  for (int i = 0; i < length; i += 1) { total += values[i]; }\n  return total / length;\n}\nint length = 0;\nint values[1] = {0};\nprintf(\"%d\\\n\", average(values, length));";
-        if (language === "C++") code = code.replace("printf(\"%d\\\n\", average(values, length));", "cout << average(values, length) << endl;");
+        code = "int average(int values[], int length) {\n  int total = 0;\n  for (int i = 0; i < length; i += 1) { total += values[i]; }\n  return total / length;\n}\nint length = 0;\nint values[1] = {0};\nprintf(\"%d\\n\", average(values, length));";
+        if (language === "C++") code = code.replace("printf(\"%d\\n\", average(values, length));", "cout << average(values, length) << endl;");
       }
       return makeItem("Which input exposes an edge case that this average function does not handle?", code,
         "An empty array or list, because its length is zero.",
@@ -686,7 +687,7 @@ document.addEventListener("DOMContentLoaded", function () {
       code = arrayDeclaration(language, values) + "\n" +
         "for (" + (language === "JavaScript" ? "let " : "int ") + "i = 0; i <= " + values.length + "; i += 1) { " +
         (language === "JavaScript" ? "console.log(values[i]);" : language === "Java" ? "System.out.println(values[i]);" :
-          language === "C" ? "printf(\"%d\\\n\", values[i]);" : "cout << values[i] << endl;") + " }";
+          language === "C" ? "printf(\"%d\\n\", values[i]);" : "cout << values[i] << endl;") + " }";
     }
     return makeItem("Which change would fix the out-of-range access in this loop?", code,
       "Change the condition so i is strictly less than the array length.",
