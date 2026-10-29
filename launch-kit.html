@@ -205,7 +205,7 @@
         {
           id: "reddit", name: "Reddit · r/SideProject", mark: "R/",
           tagline: "Share the maker story and ask for specific feedback.",
-          url: "https://www.reddit.com/r/SideProject/",
+          url: "https://www.reddit.com/r/SideProject/submit/",
           guide: "https://www.reddit.com/r/SideProject/about/rules/",
           title: "I built cH Code Helper to help beginners understand coding logic. Feedback welcome",
           body: "Hi everyone, I'm building cH Code Helper, a programming-learning tool for beginners who want to understand the logic before copying code. It has guided lessons, daily code-tracing practice, and Code Detective cases across Python, Java, JavaScript, C, and C++.\\n\\nI'm still improving it and would appreciate honest feedback: which part of the learning flow is confusing, and what would make it more useful for a student?\\n\\nTry it here: " + PROJECT_URL + "\\n\\nI'm the maker of the project, and I'll be around to answer questions."
@@ -416,8 +416,17 @@
           });
           card.appendChild(metrics);
 
+          const websiteRow = make("div", "field");
+          const websiteLabel = make("label", "", "Website link to include in your submission");
+          const websiteLink = make("a", "", PROJECT_URL);
+          websiteLink.href = PROJECT_URL;
+          websiteLink.target = "_blank";
+          websiteLink.rel = "noopener noreferrer";
+          websiteRow.append(websiteLabel, websiteLink);
+          card.appendChild(websiteRow);
+
           const actions = make("div", "platform-actions");
-          const open = make("a", "button secondary", "Open platform ↗");
+          const open = make("a", "button secondary", "Open submission page ↗");
           open.href = platform.url;
           open.target = "_blank";
           open.rel = "noopener noreferrer";
