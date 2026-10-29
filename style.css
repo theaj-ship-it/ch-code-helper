@@ -249,7 +249,8 @@ button {
   color: #e8e4d8;
 }
 
-#sample-button {
+#sample-button,
+#code-detective-start {
   margin-top: 22px;
   padding: 10px 14px;
   color: var(--text);
@@ -259,7 +260,8 @@ button {
   transition: background 180ms ease;
 }
 
-#sample-button:hover {
+#sample-button:hover,
+#code-detective-start:hover {
   background: #24252a;
 }
 
