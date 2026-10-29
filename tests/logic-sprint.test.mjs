@@ -5,6 +5,7 @@ import vm from "node:vm";
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 const html = read("../index.html");
+const launchHtml = read("../launch-kit.html");
 const css = read("../style.css");
 const practiceSource = read("../practice-lab.js");
 
@@ -37,29 +38,34 @@ test("Logic Sprint is connected to the existing page", () => {
   }
 });
 
-test("every topic has three complete questions with valid answer indexes", () => {
-  const match = practiceSource.match(/const questionBank = (\{[\s\S]*?^  \});/m);
-  assert.ok(match, "question bank object was not found");
+test("the dynamic generator creates valid cases for all topics, languages, and streak tiers", () => {
+  const start = practiceSource.indexOf("  function hashString(value) {");
+  const end = practiceSource.indexOf("  function resetFeedback() {", start);
+  assert.ok(start >= 0 && end > start, "question-generator section was found");
+  const generatorSource = practiceSource.slice(start, end);
+  const generator = vm.runInNewContext("(() => { " + generatorSource +
+    "\nreturn { hashString, makeRandom, buildQuestion }; })()");
 
-  // Evaluate only the literal question-bank object, never the application code.
-  const bank = vm.runInNewContext(`(${match[1]})`);
-  assert.deepEqual([...Object.keys(bank)].sort(), [...expectedTopics].sort());
-
+  const languages = ["Python", "Java", "JavaScript", "C", "C++"];
   for (const topic of expectedTopics) {
-    const questions = bank[topic];
-    assert.equal(questions.length, 3, `${topic} should contain exactly three questions`);
-
-    for (const [index, question] of questions.entries()) {
-      assert.equal(typeof question.question, "string", `${topic} question ${index + 1}: text`);
-      assert.ok(question.question.trim().length > 0);
-      assert.equal(Array.isArray(question.options), true);
-      assert.equal(question.options.length, 4, `${topic} question ${index + 1}: four options`);
-      assert.ok(question.options.every((option) => typeof option === "string" && option.trim()));
-      assert.ok(Number.isInteger(question.answer), `${topic} question ${index + 1}: answer index is an integer`);
-      assert.ok(question.answer >= 0 && question.answer < question.options.length,
-        `${topic} question ${index + 1}: answer index is in range`);
-      assert.equal(typeof question.explanation, "string");
-      assert.ok(question.explanation.trim().length > 0);
+    for (const language of languages) {
+      for (let tier = 0; tier <= 3; tier += 1) {
+        for (let variant = 0; variant < 3; variant += 1) {
+          const seed = generator.hashString([topic, language, tier, variant].join("|"));
+          const item = generator.buildQuestion(topic, tier, variant, language, generator.makeRandom(seed));
+          assert.equal(typeof item.question, "string", topic + " question text");
+          assert.ok(item.question.trim().length > 0);
+          assert.equal(typeof item.code, "string", topic + " code snippet");
+          assert.ok(item.code.trim().length > 0);
+          assert.equal(item.options.length, 4, topic + " should offer four choices");
+          assert.equal(new Set(item.options).size, 4, topic + " should offer distinct choices");
+          assert.ok(item.options.every((option) => typeof option === "string" && option.trim()));
+          assert.ok(Number.isInteger(item.answer) && item.answer >= 0 && item.answer < 4,
+            topic + " should have a valid answer index");
+          assert.equal(typeof item.explanation, "string");
+          assert.ok(item.explanation.trim().length > 0);
+        }
+      }
     }
   }
 });
@@ -133,13 +139,14 @@ test("a complete sprint handles correct answers, wrong answers, feedback, and sc
   }
 
   const ids = [
-    "topic", "level", "practice-topic-label", "practice-progress",
+    "topic", "level", "language", "practice-topic-label", "practice-progress",
     "practice-question", "practice-options", "practice-feedback",
     "practice-start", "practice-next", "practice-streak-count", "practice-streak-status", "practice-best-streak",
   ];
   const elements = new Map(ids.map((id) => [id, new FakeElement("div", id)]));
   elements.get("topic").value = "Loops";
   elements.get("level").value = "Beginner";
+  elements.get("language").value = "Python";
   const savedValues = new Map();
   const windowStub = { localStorage: { getItem: (key) => savedValues.get(key) || null, setItem: (key, value) => savedValues.set(key, value) } };
   let domReady;
@@ -155,16 +162,16 @@ test("a complete sprint handles correct answers, wrong answers, feedback, and sc
     },
   };
 
-  vm.runInNewContext(practiceSource, { document: documentStub, window: windowStub });
+  const instrumentedSource = practiceSource.replace(
+    '  startButton.addEventListener("click", startSprint);',
+    '  window.__logicSprintTestState = state;\n  startButton.addEventListener("click", startSprint);'
+  );
+  assert.notEqual(instrumentedSource, practiceSource, "test state hook was inserted");
+  vm.runInNewContext(instrumentedSource, { document: documentStub, window: windowStub });
   assert.equal(typeof domReady, "function", "app registers its DOM-ready callback");
   domReady();
 
-  const bankMatch = practiceSource.match(/const questionBank = (\{[\s\S]*?^  \});/m);
-  assert.ok(bankMatch, "question bank is available for the interaction test");
-  const bank = vm.runInNewContext("(" + bankMatch[1] + ")");
-  const intermediateMatch = practiceSource.match(/const intermediateQuestionBank = (\{[\s\S]*?^  \});/m);
-  assert.ok(intermediateMatch, "intermediate question bank is available");
-  const intermediateBank = vm.runInNewContext("(" + intermediateMatch[1] + ")");
+  const testState = windowStub.__logicSprintTestState;
   const questionBox = elements.get("practice-question");
   const optionsBox = elements.get("practice-options");
   const feedback = elements.get("practice-feedback");
@@ -175,9 +182,11 @@ test("a complete sprint handles correct answers, wrong answers, feedback, and sc
     start.click();
 
     for (let round = 0; round < 3; round += 1) {
-      const prompt = questionBox.children[0].textContent;
-      const item = bank.Loops.find((question) => question.question === prompt);
-      assert.ok(item, "current question belongs to Loops question bank");
+      const prompt = questionBox.children.find((child) => child.tagName === "h3")?.textContent;
+      const item = testState.questions[round];
+      assert.ok(item, "current generated question exists");
+      assert.equal(prompt, item.question, "rendered prompt matches the generated question");
+      assert.ok(questionBox.children.some((child) => child.tagName === "pre"), "code snippet is rendered");
 
       const buttons = optionsBox.querySelectorAll("button");
       assert.equal(buttons.length, 4, "each question shows four options");
@@ -185,7 +194,7 @@ test("a complete sprint handles correct answers, wrong answers, feedback, and sc
       buttons[chosenIndex].click();
 
       if (correct) {
-        assert.match(feedback.textContent, /^Correct!/, "correct answer shows positive feedback");
+        assert.match(feedback.textContent, /^Correct\./, "correct answer shows positive feedback");
         assert.equal(feedback.classList.contains("is-correct"), true);
       } else {
         assert.match(feedback.textContent, /^Not quite\./, "wrong answer explains the correction");
@@ -203,36 +212,40 @@ test("a complete sprint handles correct answers, wrong answers, feedback, and sc
   answerSprint(true);
   assert.match(questionBox.children[0].textContent, /3\/3/);
   assert.equal(elements.get("practice-streak-count").textContent, "1", "first completed sprint starts a one-day streak");
-  assert.equal(elements.get("practice-progress").textContent, "Final score: 100%");
+  assert.equal(elements.get("practice-progress").textContent, "Accuracy: 100%");
 
   answerSprint(false);
   assert.match(questionBox.children[0].textContent, /0\/3/);
-  assert.equal(elements.get("practice-progress").textContent, "Final score: 0%");
+  assert.equal(elements.get("practice-progress").textContent, "Accuracy: 0%");
   assert.equal(elements.get("practice-streak-count").textContent, "1", "multiple sprints on one day count as one streak day");
   assert.equal(JSON.parse(savedValues.values().next().value).best, 1, "best streak is saved locally");
 
   elements.get("level").value = "Intermediate";
   start.click();
-  const intermediatePrompt = questionBox.children[0].textContent;
-  assert.ok(intermediateBank.Loops.some((question) => question.question === intermediatePrompt), "intermediate selection displays a medium question");
+  assert.equal(testState.level, "Intermediate");
+  assert.ok(testState.tier >= 1, "intermediate selection uses at least the Trace tier");
+  assert.equal(testState.questions.length, 3, "intermediate selection still has three cases");
+  assert.ok(testState.questions.every((question) => question.code && question.options.length === 4),
+    "intermediate cases render complete code questions");
 });
 
 
-test("intermediate mode uses a distinct medium-difficulty bank for every topic", () => {
-  const match = practiceSource.match(/const intermediateQuestionBank = (\{[\s\S]*?^  \});/m);
-  assert.ok(match, "intermediate question bank was not found");
-  const bank = vm.runInNewContext("(" + match[1] + ")");
-  assert.deepEqual([...Object.keys(bank)].sort(), [...expectedTopics].sort());
-
-  for (const topic of expectedTopics) {
-    assert.equal(bank[topic].length, 3, topic + " should have three intermediate questions");
-    for (const [index, question] of bank[topic].entries()) {
-      assert.equal(question.options.length, 4, topic + " intermediate question " + (index + 1));
-      assert.ok(Number.isInteger(question.answer) && question.answer >= 0 && question.answer < 4);
-      assert.ok(question.explanation.trim());
-    }
+test("Creator Launch Kit has five working platform workflows and valid JavaScript", () => {
+  assert.ok(html.includes('href="launch-kit.html"'), "main page links to the Creator Launch Kit");
+  const scriptMatch = launchHtml.match(/<script>([\s\S]*?)<\/script>/);
+  assert.ok(scriptMatch, "launch-kit script is present");
+  assert.doesNotThrow(() => new vm.Script(scriptMatch[1]), "launch-kit JavaScript parses");
+  for (const platform of ["reddit", "hackernews", "producthunt", "indiehackers", "uneed"]) {
+    assert.ok(launchHtml.includes('id: "' + platform + '"'), "missing platform: " + platform);
   }
-  assert.notEqual(bank.Loops[0].question, "A loop runs for i = 1, 2, 3. It adds i each time. What is the final total?");
+  for (const id of ["launch-date", "platform-grid", "launch-checklist", "export-plan", "reset-plan", "save-status"]) {
+    assert.ok(launchHtml.includes('id="' + id + '"'), "missing launch-kit control: " + id);
+  }
+  assert.match(scriptMatch[1], /localStorage\.setItem/);
+  assert.match(scriptMatch[1], /navigator\.clipboard/);
+  assert.match(scriptMatch[1], /new Blob/);
+  assert.doesNotMatch(scriptMatch[1], /\bfetch\s*\(|XMLHttpRequest|WebSocket/,
+    "launch-kit should not pretend to publish posts or fetch live metrics");
 });
 
 test("streak UI and local-only storage are wired into the practice module", () => {
