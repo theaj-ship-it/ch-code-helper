@@ -13,6 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="challenge-game.css">
 </head>
 
 <body>
@@ -131,13 +132,12 @@
 
       <div id="lesson-output" aria-live="polite">
         <p>
-          Submit a question to receive a lesson with clear logic,
-          a worked example, and a practice challenge.
+          Build a lesson above or launch a Code Detective case to learn by inspecting code.
         </p>
       </div>
 
-      <button id="sample-button" type="button">
-        Load a sample lesson
+      <button id="code-detective-start" type="button">
+        Start Code Detective
       </button>
     </section>
 
@@ -150,7 +150,7 @@
         </div>
       </div>
 
-      <p class="practice-intro">A quick, offline mini-quiz based on your selected topic. Choose an answer to get immediate feedback, then try the next question.</p>
+      <p class="practice-intro">Daily code-inspection cases for Python, Java, JavaScript, C and C++. Keep your streak alive to unlock harder tracing, debugging and reasoning missions.</p>
       
       <div class="practice-streak-card" aria-label="Daily practice streak">
         <div class="streak-flame" aria-hidden="true">🔥</div>
@@ -168,7 +168,7 @@
       </div>
       <div id="practice-question" class="practice-question" aria-live="polite">
         <h3>Ready for a quick challenge?</h3>
-        <p>Start a 3-question sprint. No API key or account is needed.</p>
+        <p>Start a 3-case daily sprint. Your selected language and streak set the difficulty.</p>
       </div>
       <div id="practice-options" class="practice-options"></div>
       <p id="practice-feedback" class="practice-feedback" role="status" aria-live="polite"></p>
@@ -176,7 +176,7 @@
         <button id="practice-start" type="button">Start Logic Sprint</button>
         <button id="practice-next" type="button" disabled>Next question →</button>
       </div>
-      <p class="practice-footnote">Practice answers are checked in your browser. This mini-quiz does not execute submitted code.</p>
+      <p class="practice-footnote">Questions rotate daily in this browser. No account, AI API call, or submitted-code execution is used by Logic Sprint.</p>
     </section>
   </main>
 
@@ -190,6 +190,7 @@
   <script src="api-config.js"></script>
   <script src="script.js"></script>
   <script src="practice-lab.js"></script>
+  <script src="challenge-game.js"></script>
 
   <script>
     (() => {

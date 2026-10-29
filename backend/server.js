@@ -249,41 +249,47 @@ app.post("/api/challenge", async (req, res) => {
         : "General programming";
 
     const prompt = `
-You are cH Code Helper, an adaptive programming challenge designer.
+You are cH Code Helper, a patient programming tutor and code-investigation game designer.
 
-Create ONE original programming practice challenge.
+Create ONE interactive Code Detective case. The student should learn by finding a detail in a provided code snippet, not by being asked to write a whole program from scratch.
 
 Programming language: ${safeLanguage}
 Student level: ${safeLevel}
 Topic: ${safeTopic}
 
-Difficulty requirements:
-- Beginner: small, approachable problem; clear goal; minimal prerequisites;
-  use familiar concepts and avoid unnecessary complexity.
-- Intermediate: require reasoning and implementation choices; include
-  relevant constraints or edge cases; discuss complexity in the solution.
+Game design:
+- Ask the learner to inspect and reason about the supplied code: trace the output, follow changing values, find a bug, identify an off-by-one boundary, understand a condition/function/data structure, or spot an algorithm requirement.
+- Beginner cases should be short, concrete, and teachable in 1-8 code lines. Intermediate cases can use 5-16 lines and require multiple reasoning steps, edge-case analysis, or debugging.
+- Use genuine ${safeLanguage} syntax and language-specific conventions. Do not mix languages.
+- The code must be enough to answer one specific question. Keep the question focused on a finding in that code.
+- Provide exactly four distinct answer choices in requirements, with exactly one unambiguously correct choice and three plausible misconceptions.
+- Keep each requirements item as answer text only, without A/B/C/D labels. The frontend labels the choices.
+- exampleOutput must exactly match the text of the one correct requirements item, with no extra wording. The frontend uses this for answer checking.
+- Hints must be progressive: the first nudges attention to the relevant line/concept; the second is more specific but does not simply give the full answer.
+- explanation must teach a repeatable way of analysing the snippet, walk through the important lines, and explain why the correct choice is correct and the others are not.
+- solution should contain the code shown in the case, or a corrected version if the question asks the student to find and fix a bug. Do not add unrelated code.
+- Do not claim the code was executed.
 
-Return ONLY valid JSON. Do not use Markdown fences or text outside JSON.
-Use exactly this structure:
+Return ONLY valid JSON. No Markdown fences and no text outside JSON. Use exactly this structure:
 {
-  "title": "Short challenge title",
-  "problem": "Clear problem statement in simple language",
-  "requirements": ["Requirement one", "Requirement two"],
-  "exampleInput": "Example input, or a brief description if not applicable",
-  "exampleOutput": "Correct expected output",
-  "hints": [
-    "First hint: a gentle direction, not the full answer",
-    "Second hint: a more specific clue, still not the full code"
-  ],
-  "solution": "Complete valid code in the requested language",
-  "explanation": "Explain the solution step by step for the selected level",
-  "complexity": "Time and space complexity when relevant; otherwise say Not applicable"
+  "title": "Short case name",
+  "problem": "SCENARIO: short context\\n---CODE---\\nplain code snippet with no Markdown fences\\n---QUESTION---\\nOne precise investigation question",
+  "requirements": ["First possible observation", "Second possible observation", "Third possible observation", "Fourth possible observation"],
+  "exampleInput": "Starting values or test input, if useful; otherwise an empty string",
+  "exampleOutput": "Exact text of the correct requirements item, copied without changes",
+  "hints": ["First gentle clue", "Second more specific clue"],
+  "solution": "Code snippet or corrected code in the requested language",
+  "explanation": "A clear, step-by-step explanation of how to inspect the code and reach the answer",
+  "complexity": "Brief efficiency note when relevant, or Not applicable"
 }
 
-Ensure the example output matches the solution logically.
-Use valid ${safeLanguage} syntax. Do not claim that code was executed.
-The hints must not contain the complete solution.
-The solution should solve the exact problem and address relevant edge cases.
+Important separator format inside problem:
+- Start with SCENARIO: and one or two short sentences.
+- Put a line containing only ---CODE--- next.
+- Put the source code on the following lines. Do not use Markdown fences around it.
+- Put a line containing only ---QUESTION--- after the code, then the precise question.
+- Keep the separators exactly spelled ---CODE--- and ---QUESTION---.
+- Make sure the exampleOutput is an exact match for one answer option and that the explanation supports that answer.
 `;
 
     const response = await ai.models.generateContent({
@@ -315,10 +321,27 @@ The solution should solve the exact problem and address relevant edge cases.
       });
     }
 
+    const options = Array.isArray(challenge.requirements)
+      ? challenge.requirements.slice(0, 4).map((item) => String(item).trim())
+      : [];
+    const answerKey = typeof challenge.exampleOutput === "string"
+      ? challenge.exampleOutput.trim()
+      : "";
+    const hasStructuredProblem =
+      typeof challenge.problem === "string" &&
+      challenge.problem.trim().startsWith("SCENARIO:") &&
+      challenge.problem.includes("---CODE---") &&
+      challenge.problem.indexOf("---QUESTION---") > challenge.problem.indexOf("---CODE---");
+
     const valid =
       typeof challenge.title === "string" &&
-      typeof challenge.problem === "string" &&
+      hasStructuredProblem &&
       Array.isArray(challenge.requirements) &&
+      options.length === 4 &&
+      options.every(Boolean) &&
+      new Set(options).size === 4 &&
+      answerKey.length > 0 &&
+      options.includes(answerKey) &&
       Array.isArray(challenge.hints) &&
       challenge.hints.length >= 2 &&
       typeof challenge.solution === "string" &&
@@ -336,7 +359,7 @@ The solution should solve the exact problem and address relevant edge cases.
       challenge: {
         title: challenge.title,
         problem: challenge.problem,
-        requirements: challenge.requirements.slice(0, 8),
+        requirements: options,
         exampleInput: String(challenge.exampleInput || ""),
         exampleOutput: String(challenge.exampleOutput || ""),
         hints: challenge.hints.slice(0, 2).map(String),

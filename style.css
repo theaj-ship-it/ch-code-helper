@@ -263,6 +263,21 @@ button {
   background: #24252a;
 }
 
+/* Keep the Code Detective entry point visually consistent with the former challenge button. */
+#code-detective-start {
+  margin-top: 22px;
+  padding: 10px 14px;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid #484950;
+  border-radius: 10px;
+  transition: background 180ms ease;
+}
+
+#code-detective-start:hover {
+  background: #24252a;
+}
+
 footer {
   padding: 24px 20px 34px;
   border-top: 1px solid #222329;

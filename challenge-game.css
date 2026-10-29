@@ -1,0 +1,183 @@
+/* Code Detective: code-investigation game styling */
+.detective-panel {
+  display: grid;
+  gap: 14px;
+  margin: 8px 0 18px;
+  padding: clamp(16px, 2.5vw, 24px);
+  border: 1px solid rgba(73, 197, 220, .30);
+  border-radius: 18px;
+  background: linear-gradient(150deg, rgba(7, 17, 27, .98), rgba(10, 13, 19, .97));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .035), 0 12px 34px rgba(0, 0, 0, .24);
+}
+.detective-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.detective-case-chip,
+.detective-xp {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 10px;
+  border: 1px solid rgba(73, 197, 220, .28);
+  border-radius: 999px;
+  color: #a9eaf4;
+  background: rgba(25, 79, 91, .18);
+  font-size: .76rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+}
+.detective-xp { color: #d8d0a3; border-color: rgba(204, 177, 91, .28); background: rgba(90, 73, 28, .15); }
+.detective-mission-title { margin: 0; font-size: clamp(1.25rem, 2vw, 1.7rem); }
+.detective-instruction,
+.detective-level,
+.detective-question { margin: 0; color: #d1dae2; line-height: 1.65; }
+.detective-level { color: #83d7e8; font-size: .85rem; }
+.detective-input-box,
+.detective-clue,
+.detective-reasoning,
+.detective-solution-area {
+  padding: 13px 15px;
+  border: 1px solid rgba(101, 132, 151, .25);
+  border-radius: 12px;
+  background: rgba(20, 30, 40, .78);
+}
+.detective-input-box strong,
+.detective-clue strong { color: #a6e9f3; }
+.detective-input-box p,
+.detective-clue p { margin: 6px 0 0; color: #d3dbe4; line-height: 1.6; }
+.detective-code-label {
+  margin: 4px 0 -5px;
+  color: #8cddea;
+  font-size: .73rem;
+  letter-spacing: .15em;
+  font-weight: 800;
+}
+.detective-code {
+  max-width: 100%;
+  margin: 0;
+  padding: 17px;
+  overflow: auto;
+  border: 1px solid rgba(66, 191, 218, .25);
+  border-radius: 12px;
+  color: #d9f6ff;
+  background: #050a10;
+  white-space: pre;
+  tab-size: 4;
+  font: .86rem/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  -webkit-overflow-scrolling: touch;
+}
+.detective-code code {
+  color: inherit;
+  font: inherit;
+}
+.detective-solution-code { border-color: rgba(101, 185, 138, .35); }
+.detective-question-title,
+.detective-section-title { margin: 3px 0 0; font-size: 1.05rem; }
+.detective-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.detective-option,
+.detective-action {
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid #38505e;
+  border-radius: 11px;
+  color: #e8eef3;
+  background: #111e29;
+  text-align: left;
+  font: inherit;
+  line-height: 1.45;
+  cursor: pointer;
+  transition: border-color 140ms ease, background 140ms ease, transform 140ms ease;
+}
+.detective-option:hover:not(:disabled),
+.detective-action:hover:not(:disabled) {
+  border-color: #5bd9ed;
+  background: #142c38;
+}
+.detective-option:focus-visible,
+.detective-action:focus-visible {
+  outline: 2px solid #5bd9ed;
+  outline-offset: 3px;
+}
+.detective-option:disabled,
+.detective-action:disabled { opacity: .7; cursor: default; }
+.detective-option.is-correct { border-color: #65b98a; background: #10251b; }
+.detective-option.is-wrong { border-color: #c97878; background: #2a1719; }
+.detective-actions { display: flex; flex-wrap: wrap; gap: 9px; }
+.detective-action {
+  width: auto;
+  color: #03131a;
+  border-color: #4de0f4;
+  background: #4de0f4;
+  text-align: center;
+  font-weight: 800;
+}
+.detective-secondary { color: #dcecf2; border-color: #40505d; background: #121922; }
+.detective-feedback { min-height: 1.4em; margin: 0; color: #d5e1e8; line-height: 1.6; }
+.detective-feedback.is-correct { color: #91e4b0; }
+.detective-feedback.is-wrong { color: #ffb0b0; }
+.detective-clues,
+.detective-reasoning,
+.detective-solution-area { display: grid; gap: 10px; }
+.detective-complexity { margin: 0; color: #93dce9; }
+.detective-complete { margin: 0; color: #a7e6b9; line-height: 1.6; }
+.detective-missing-code { color: #e5c99a; }
+.detective-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(101, 132, 151, .2);
+}
+.detective-footer p { margin: 0; color: #94a8b7; font-size: .82rem; line-height: 1.5; }
+.detective-panel [hidden] { display: none !important; }
+
+.practice-case-label {
+  display: inline-flex;
+  align-self: start;
+  margin: 0 0 7px;
+  padding: 5px 9px;
+  border: 1px solid rgba(73, 197, 220, .22);
+  border-radius: 999px;
+  color: #9ae3ef;
+  background: rgba(21, 77, 91, .16);
+  font-size: .76rem;
+  font-weight: 800;
+}
+.practice-code-label { margin: 14px 0 7px; color: #8cddea !important; font-size: .72rem; letter-spacing: .14em; font-weight: 800; }
+.practice-code {
+  margin: 0;
+  padding: 15px;
+  max-width: 100%;
+  overflow: auto;
+  border: 1px solid rgba(66, 191, 218, .22);
+  border-radius: 11px;
+  color: #d9f6ff;
+  background: #050a10;
+  white-space: pre;
+  tab-size: 4;
+  font: .82rem/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  -webkit-overflow-scrolling: touch;
+}
+.practice-code code { color: inherit; font: inherit; }
+.practice-level-note { margin-top: 10px !important; color: #94a8b7 !important; font-size: .82rem; }
+
+@media (max-width: 600px) {
+  .detective-panel { padding: 15px; border-radius: 14px; }
+  .detective-options { grid-template-columns: 1fr; }
+  .detective-code, .practice-code { padding: 12px; font-size: .73rem; }
+  .detective-option, .detective-action { min-height: 44px; }
+  .detective-footer { align-items: stretch; }
+  .detective-footer .detective-action { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .detective-option, .detective-action { transition: none; }
+}
