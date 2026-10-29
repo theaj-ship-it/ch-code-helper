@@ -321,10 +321,27 @@ Important separator format inside problem:
       });
     }
 
+    const options = Array.isArray(challenge.requirements)
+      ? challenge.requirements.slice(0, 4).map((item) => String(item).trim())
+      : [];
+    const answerKey = typeof challenge.exampleOutput === "string"
+      ? challenge.exampleOutput.trim()
+      : "";
+    const hasStructuredProblem =
+      typeof challenge.problem === "string" &&
+      challenge.problem.trim().startsWith("SCENARIO:") &&
+      challenge.problem.includes("---CODE---") &&
+      challenge.problem.indexOf("---QUESTION---") > challenge.problem.indexOf("---CODE---");
+
     const valid =
       typeof challenge.title === "string" &&
-      typeof challenge.problem === "string" &&
+      hasStructuredProblem &&
       Array.isArray(challenge.requirements) &&
+      options.length === 4 &&
+      options.every(Boolean) &&
+      new Set(options).size === 4 &&
+      answerKey.length > 0 &&
+      options.includes(answerKey) &&
       Array.isArray(challenge.hints) &&
       challenge.hints.length >= 2 &&
       typeof challenge.solution === "string" &&
@@ -342,7 +359,7 @@ Important separator format inside problem:
       challenge: {
         title: challenge.title,
         problem: challenge.problem,
-        requirements: challenge.requirements.slice(0, 8),
+        requirements: options,
         exampleInput: String(challenge.exampleInput || ""),
         exampleOutput: String(challenge.exampleOutput || ""),
         hints: challenge.hints.slice(0, 2).map(String),
