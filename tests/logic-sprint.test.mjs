@@ -192,7 +192,7 @@ test("a complete sprint handles correct answers, wrong answers, feedback, and sc
       buttons[chosenIndex].click();
 
       if (correct) {
-        assert.match(feedback.textContent, /^Correct\\./, "correct answer shows positive feedback");
+        assert.match(feedback.textContent, /^Correct\./, "correct answer shows positive feedback");
         assert.equal(feedback.classList.contains("is-correct"), true);
       } else {
         assert.match(feedback.textContent, /^Not quite\./, "wrong answer explains the correction");
