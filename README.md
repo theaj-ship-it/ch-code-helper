@@ -91,26 +91,33 @@ Check `http://localhost:3000/health`. For local browser testing, set `CORS_ORIGI
 - OpenAI model documentation: https://platform.openai.com/docs/models
 
 
-## Logic Sprint (new practice feature)
+## Logic Sprint: daily code tracing
 
-The **Logic Sprint** panel adds a small, browser-based practice round alongside the existing AI tutor:
+The **Logic Sprint** panel is a browser-based code-investigation practice round alongside the AI tutor:
 
-- Three multiple-choice questions for the selected topic.
-- Instant correct/incorrect feedback with explanations.
-- Score tracking, next-question flow, and restart support.
-- Topic coverage for loops, arrays, variables, functions, conditions, OOP, data structures, algorithms, and general problem-solving.
-- Runs locally in the browser and does not call the AI API or execute submitted code.
+- Three generated cases per sprint for the selected topic and programming language.
+- Cases show snippets in Python, Java, JavaScript, C, or C++. Learners trace values, inspect conditions, follow data structures, spot boundary bugs, and reason about algorithm requirements.
+- Each answer gives immediate feedback and a step-by-step explanation. Scores and the next-case flow work offline.
+- Cases are seeded by the local date, selected language, topic, level, and difficulty tier. The set rotates by date without requiring an AI request or API key.
+- The sprint does not execute the displayed code. The examples are for reading and reasoning.
 
-The feature is being developed on the `feature/logic-sprint-practice` branch. The existing lesson form and backend endpoints are left unchanged.
+## Logic Sprint: streak-based difficulty
 
+- The first completed sprint on a local calendar day records that practice day. Completing more sprints on the same day does not increase the streak again.
+- The current and best streak are stored in this browser's local storage. Clearing browser data or switching devices resets the saved streak.
+- Beginner starts at Warm-up; Intermediate starts at Trace. Planned streak days 3, 7, and 14 add difficulty, progressing through Trace, Debug, and Deep Dive.
+- A missed day resets the current streak but keeps the best streak. Difficulty is calculated using the upcoming streak day, so learners see the next tier when they start that day's sprint.
 
-## Logic Sprint: levels and daily streaks
+## Code Detective: learn by investigating code
 
-- **Beginner** uses the easy practice bank; **Intermediate** uses a separate medium-difficulty bank. Each of the nine topics has three questions at each level.
-- The daily streak counts the first completed sprint on a local calendar day. More sprints on that day do not inflate the streak; practising on the next consecutive day increases it.
-- The current and best streak are saved in the browser's local storage on that device. No account or server-side tracking is used; clearing browser data or switching devices will reset the saved streak.
-- A streak is a consistency aid, not a penalty: a missed day resets the current streak but does not erase the best streak.
+The main Challenge button starts **Code Detective**, an interactive investigation game using the existing `/api/challenge` backend endpoint.
 
+- A case presents a scenario, a line-numbered snippet in the selected language, and one precise question about what to find in the code.
+- Four answer options let students test their understanding. Incorrect choices stay disabled while the student examines other options or asks for progressive clues.
+- Correct answers award local XP, with larger rewards for solving the case without clues. XP is stored in the same browser and is not account-linked.
+- After a correct answer or both clues, the learner can review the reasoning and unlock the solution. Explanations focus on how to inspect the code, not merely which option is correct.
+- The AI response uses `SCENARIO:`, `---CODE---`, and `---QUESTION---` markers inside the `problem` field. The `requirements` array holds four answer-choice strings, and `exampleOutput` must exactly match the correct option.
+- Code Detective displays and teaches from snippets; it does not compile or execute the displayed code. Review AI-generated examples for correctness.
 
 ## Tutor file attachments
 
