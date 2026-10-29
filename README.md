@@ -126,3 +126,13 @@ The lesson form supports up to three attachments per request:
 - PDFs and PNG/JPG/WebP images (up to 5 MB each, and 7 MB combined).
 
 Text/code file contents are read in the browser; PDFs and images are encoded for the request. Attachments are sent to the backend and AI provider for analysis and are not intentionally saved by the frontend. Do not upload secrets or sensitive personal data. File attachments are optional; students should still write a question explaining what they want help with.
+
+## Creator Launch Kit
+
+The standalone `launch-kit.html` page adapts the supplied five-platform launch-workflow video into a practical workspace for cH Code Helper. It includes drafts for Reddit, Hacker News Show HN, Product Hunt, Indie Hackers, and Uneed; links to platform pages and relevant guidelines; a target-date reminder; a preparation checklist; and manually entered visits, replies, and learners-reached totals.
+
+- Drafts, statuses, checklist items, the reminder date, and manually entered results save in browser local storage.
+- The export action downloads the plan as JSON, and Reset clears the saved plan in that browser.
+- The page does not publish to external platforms or retrieve platform analytics. Do not interpret manually entered numbers as verified platform data.
+- Read the current platform rules before posting. Show HN is intended for a working project people can try; Product Hunt guidance prohibits requesting upvotes. Ask for useful feedback instead.
+
