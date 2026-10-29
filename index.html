@@ -17,9 +17,7 @@
 
 <body>
   <div class="ambient-background" aria-hidden="true">
-    <video class="ambient-video" muted loop playsinline preload="none" poster="holographic-scene.svg" aria-hidden="true">
-      <source src="ch-code-helper-holographic-globe.mp4" type="video/mp4">
-    </video>
+    <video class="ambient-video" muted loop playsinline autoplay preload="none" poster="holographic-scene.svg" aria-hidden="true" tabindex="-1" data-background-video="ch-code-helper-holographic-globe.mp4"></video>
   </div>
   <header class="site-header">
     <p class="eyebrow">THE cH LEARNING SPACE</p>
@@ -192,5 +190,45 @@
   <script src="api-config.js"></script>
   <script src="script.js"></script>
   <script src="practice-lab.js"></script>
+
+  <script>
+    (() => {
+      const video = document.querySelector(".ambient-video");
+      if (!video) return;
+      const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const compactOrTouch = window.matchMedia("(max-width: 760px), (pointer: coarse)");
+      const videoPath = video.dataset.backgroundVideo;
+      let loaded = false;
+      function syncBackgroundMotion() {
+        const shouldAnimate = !motionPreference.matches && !compactOrTouch.matches;
+        if (!shouldAnimate) {
+          if (loaded) {
+            video.pause();
+            video.removeAttribute("src");
+            video.load();
+            loaded = false;
+          }
+          video.classList.remove("is-playing");
+          return;
+        }
+        if (!loaded) {
+          video.src = videoPath;
+          video.load();
+          loaded = true;
+        }
+        const playAttempt = video.play();
+        if (playAttempt && typeof playAttempt.then === "function") {
+          playAttempt.then(() => video.classList.add("is-playing"))
+            .catch(() => video.classList.remove("is-playing"));
+        }
+      }
+      [motionPreference, compactOrTouch].forEach(query => {
+        if (typeof query.addEventListener === "function") query.addEventListener("change", syncBackgroundMotion);
+        else if (typeof query.addListener === "function") query.addListener(syncBackgroundMotion);
+      });
+      syncBackgroundMotion();
+    })();
+  </script>
+
 </body>
 </html>

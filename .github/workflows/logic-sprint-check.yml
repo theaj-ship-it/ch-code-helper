@@ -25,3 +25,5 @@ jobs:
           node --check tests/logic-sprint.test.mjs
       - name: Test Logic Sprint integration and question data
         run: node --test tests/logic-sprint.test.mjs
+      - name: Test animated background asset and fallbacks
+        run: node --test tests/background.test.mjs
