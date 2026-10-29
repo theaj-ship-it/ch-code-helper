@@ -162,7 +162,7 @@ test("a complete sprint handles correct answers, wrong answers, feedback, and sc
 
   const instrumentedSource = practiceSource.replace(
     '  startButton.addEventListener("click", startSprint);',
-    '  window.__logicSprintTestState = state;\\n  startButton.addEventListener("click", startSprint);'
+    '  window.__logicSprintTestState = state;\n  startButton.addEventListener("click", startSprint);'
   );
   assert.notEqual(instrumentedSource, practiceSource, "test state hook was inserted");
   vm.runInNewContext(instrumentedSource, { document: documentStub, window: windowStub });
