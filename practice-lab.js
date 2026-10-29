@@ -397,7 +397,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const callLine = language === "Java"
           ? "System.out.println(score(threshold, threshold));"
           : language === "C"
-            ? "printf(\\\"%d\\\\n\\\", score(threshold, threshold));"
+            ? "printf(\"%d\\n\", score(threshold, threshold));"
             : "cout << score(threshold, threshold) << endl;";
         code = "int score(int value, int cutoff) { if (value > cutoff) { return 2; } return 1; }\nint threshold = " + threshold + ";\n" + callLine;
       }
