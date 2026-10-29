@@ -390,13 +390,16 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       const threshold = randomInt(random, 5, 8 + tier);
       if (language === "Python") {
-        code = "threshold = " + threshold + "\ndef score(value):\n    if value > threshold:\n        return 2\n    return 1\nprint(score(threshold))";
+        code = "def score(value, cutoff):\n    if value > cutoff:\n        return 2\n    return 1\n\nthreshold = " + threshold + "\nprint(score(threshold, threshold))";
       } else if (language === "JavaScript") {
-        code = "let threshold = " + threshold + ";\nfunction score(value) { if (value > threshold) { return 2; } return 1; }\nconsole.log(score(threshold));";
+        code = "function score(value, cutoff) { if (value > cutoff) { return 2; } return 1; }\nlet threshold = " + threshold + ";\nconsole.log(score(threshold, threshold));";
       } else {
-        code = "int threshold = " + threshold + ";\nint score(int value) { if (value > threshold) { return 2; } return 1; }\n" +
-          (language === "Java" ? "System.out.println(score(threshold));" :
-            language === "C" ? "printf(\"%d\\n\", score(threshold));" : "cout << score(threshold) << endl;");
+        const callLine = language === "Java"
+          ? "System.out.println(score(threshold, threshold));"
+          : language === "C"
+            ? "printf(\\\"%d\\\\n\\\", score(threshold, threshold));"
+            : "cout << score(threshold, threshold) << endl;";
+        code = "int score(int value, int cutoff) { if (value > cutoff) { return 2; } return 1; }\nint threshold = " + threshold + ";\n" + callLine;
       }
       return makeItem("The input equals threshold exactly. Which return value is produced?", code, 1,
         [0, 2, threshold],
