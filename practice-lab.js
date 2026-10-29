@@ -207,24 +207,24 @@ document.addEventListener("DOMContentLoaded", function () {
     if (language === "Python") return "print(" + expression + ")";
     if (language === "JavaScript") return "console.log(" + expression + ");";
     if (language === "Java") return "System.out.println(" + expression + ");";
-    if (language === "C") return "printf(\"%d\\\\n\", " + expression + ");";
+    if (language === "C") return "printf(\"%d\\\n\", " + expression + ");";
     return "cout << " + expression + " << endl;";
   }
 
   function forLoop(language, variable, start, stopExclusive, step, bodyLines) {
     if (language === "Python") {
-      return "for " + variable + " in range(" + start + ", " + stopExclusive + ", " + step + "):\\n" +
-        bodyLines.map(function (line) { return "    " + line; }).join("\\n");
+      return "for " + variable + " in range(" + start + ", " + stopExclusive + ", " + step + "):\n" +
+        bodyLines.map(function (line) { return "    " + line; }).join("\n");
     }
     const variableType = language === "JavaScript" ? "let " : "int ";
     return "for (" + variableType + variable + " = " + start + "; " +
-      variable + " < " + stopExclusive + "; " + variable + " += " + step + ") {\\n" +
-      bodyLines.map(function (line) { return "    " + line; }).join("\\n") + "\\n}";
+      variable + " < " + stopExclusive + "; " + variable + " += " + step + ") {\n" +
+      bodyLines.map(function (line) { return "    " + line; }).join("\n") + "\n}";
   }
 
   function functionDefinition(language, name, parameters, expression) {
     if (language === "Python") {
-      return "def " + name + "(" + parameters.join(", ") + "):\\n    return " + expression;
+      return "def " + name + "(" + parameters.join(", ") + "):\n    return " + expression;
     }
     if (language === "JavaScript") {
       return "function " + name + "(" + parameters.join(", ") + ") { return " + expression + "; }";
@@ -246,8 +246,8 @@ document.addEventListener("DOMContentLoaded", function () {
       if (variant === 0) {
         const n = randomInt(random, 2 + tier, 4 + tier);
         answer = n * (n + 1) / 2;
-        code = declareInt(language, "total", 0) + "\\n" +
-          forLoop(language, "i", 1, n + 1, 1, ["total += i;"]) + "\\n" +
+        code = declareInt(language, "total", 0) + "\n" +
+          forLoop(language, "i", 1, n + 1, 1, ["total += i;"]) + "\n" +
           printLine(language, "total");
         return makeItem("Trace the loop. What value is printed at the end?", code, answer,
           [answer - 1, answer + n, n * n], "The loop adds every integer from 1 through " + n +
@@ -259,11 +259,11 @@ document.addEventListener("DOMContentLoaded", function () {
         for (let i = 0; i < limit; i += 1) if (i % 2 === 0) evens.push(i);
         answer = evens.reduce(function (sum, value) { return sum + value; }, 0);
         if (language === "Python") {
-          code = "total = 0\\nfor i in range(0, " + limit + "):\\n    if i % 2 == 0:\\n        total += i\\nprint(total)";
+          code = "total = 0\nfor i in range(0, " + limit + "):\n    if i % 2 == 0:\n        total += i\nprint(total)";
         } else {
-          code = declareInt(language, "total", 0) + "\\n" +
+          code = declareInt(language, "total", 0) + "\n" +
             forLoop(language, "i", 0, limit, 1, ["if (i % 2 == 0) { total += i; }"]) +
-            "\\n" + printLine(language, "total");
+            "\n" + printLine(language, "total");
         }
         return makeItem("Only even counter values are added. What is the final total?", code, answer,
           [answer + 2, answer + limit, answer - 2], "The condition keeps only even values below " +
@@ -272,11 +272,11 @@ document.addEventListener("DOMContentLoaded", function () {
       const n = randomInt(random, 3 + tier, 5 + tier);
       answer = n * (n - 1) / 2;
       if (language === "Python") {
-        code = "count = 0\\nfor i in range(" + n + "):\\n    for j in range(i):\\n        count += 1\\nprint(count)";
+        code = "count = 0\nfor i in range(" + n + "):\n    for j in range(i):\n        count += 1\nprint(count)";
       } else {
         const type = language === "JavaScript" ? "let " : "int ";
-        code = type + "count = 0;\\nfor (" + type + "i = 0; i < " + n + "; i += 1) {\\n" +
-          "    for (" + type + "j = 0; j < i; j += 1) { count += 1; }\\n}\\n" + printLine(language, "count");
+        code = type + "count = 0;\nfor (" + type + "i = 0; i < " + n + "; i += 1) {\n" +
+          "    for (" + type + "j = 0; j < i; j += 1) { count += 1; }\n}\n" + printLine(language, "count");
       }
       return makeItem("Count the inner-loop runs. How many times is count increased?", code, answer,
         [n * n, n, answer + 1], "For i values 0 through " + (n - 1) +
@@ -289,9 +289,9 @@ document.addEventListener("DOMContentLoaded", function () {
       if (variant === 0) {
         const index = randomInt(random, 0, values.length - 1);
         answer = values[index];
-        code = arrayDeclaration(language, values) + "\\n" +
-          declareInt(language, "index", index) + "\\n" +
-          declareInt(language, "result", 0).replace("0", "values[index]") + "\\n" +
+        code = arrayDeclaration(language, values) + "\n" +
+          declareInt(language, "index", index) + "\n" +
+          declareInt(language, "result", 0).replace("0", "values[index]") + "\n" +
           printLine(language, "result");
         return makeItem("The array uses zero-based indexing. What value is stored in result?", code, answer,
           values.filter(function (_, i) { return i !== index; }).concat([index, answer + 3]),
@@ -302,9 +302,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const delta = randomInt(random, 2 + tier, 4 + tier);
         const changed = values.slice();
         changed[index] += delta;
-        code = arrayDeclaration(language, values) + "\\n" +
-          declareInt(language, "index", index) + "\\n" +
-          declareInt(language, "delta", delta) + "\\nvalues[index] += delta;";
+        code = arrayDeclaration(language, values) + "\n" +
+          declareInt(language, "index", index) + "\n" +
+          declareInt(language, "delta", delta) + "\nvalues[index] += delta;";
         return makeItem("After the update, what does the array contain?", code, arrayText(changed),
           [arrayText(values), arrayText(values.map(function (value, i) { return value + (i === (index + 1) % values.length ? delta : 0); })),
             arrayText(values.map(function (value, i) { return value - (i === index ? delta : 0); }))],
@@ -313,13 +313,13 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       const sample = [4, 9, 14];
       if (language === "Python") {
-        code = "values = [4, 9, 14]\\nfor i in range(0, len(values) + 1):\\n    print(values[i])";
+        code = "values = [4, 9, 14]\nfor i in range(0, len(values) + 1):\n    print(values[i])";
       } else {
-        code = arrayDeclaration(language, sample) + "\\n" +
-          declareInt(language, "length", sample.length) + "\\n" +
-          "for (int i = 0; i <= length; i += 1) { " +
+        code = arrayDeclaration(language, sample) + "\n" +
+          declareInt(language, "length", sample.length) + "\n" +
+          "for (" + (language === "JavaScript" ? "let " : "int ") + "i = 0; i <= length; i += 1) { " +
           (language === "JavaScript" ? "console.log(values[i]);" : language === "Java" ? "System.out.println(values[i]);" :
-            language === "C" ? "printf(\"%d\\\\n\", values[i]);" : "cout << values[i] << endl;") + " }";
+            language === "C" ? "printf(\"%d\\\n\", values[i]);" : "cout << values[i] << endl;") + " }";
       }
       return makeItem("The array has three elements. What defect will appear at the end of this loop?", code,
         "The loop tries to access index 3, which is outside the array.",
@@ -334,9 +334,9 @@ document.addEventListener("DOMContentLoaded", function () {
       if (variant === 0) {
         const x = randomInt(random, 3, 8);
         const y = randomInt(random, 1, 4);
-        code = declareInt(language, "x", x) + "\\n" + declareInt(language, "y", y) +
-          "\\nx = x + y;\\ny = x - y;\\nx = x - y;\\n" +
-          printLine(language, "x") + "\\n" + printLine(language, "y");
+        code = declareInt(language, "x", x) + "\n" + declareInt(language, "y", y) +
+          "\nx = x + y;\ny = x - y;\nx = x - y;\n" +
+          printLine(language, "x") + "\n" + printLine(language, "y");
         answer = "x = " + y + ", y = " + x;
         return makeItem("Track x and y after every assignment. What are their final values?", code, answer,
           ["x = " + x + ", y = " + y, "x = " + (x + y) + ", y = " + y,
@@ -348,7 +348,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const multiplier = randomInt(random, 2, 3);
         const subtract = randomInt(random, 1, 4 + tier);
         answer = start * multiplier - subtract;
-        code = declareInt(language, "value", start) + "\\nvalue *= " + multiplier + ";\\nvalue -= " + subtract + ";\\n" +
+        code = declareInt(language, "value", start) + "\nvalue *= " + multiplier + ";\nvalue -= " + subtract + ";\n" +
           printLine(language, "value");
         return makeItem("Follow the updates in order. What is printed?", code, answer,
           [start + multiplier - subtract, start * multiplier + subtract, start * multiplier],
@@ -356,8 +356,8 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       const x = randomInt(random, 2, 6);
       const y = randomInt(random, 2, 5);
-      code = declareInt(language, "x", x) + "\\n" + declareInt(language, "y", y) +
-        "\\nx += y;\\ny += x;\\nx = y - x;\\n" + printLine(language, "x") + "\\n" + printLine(language, "y");
+      code = declareInt(language, "x", x) + "\n" + declareInt(language, "y", y) +
+        "\nx += y;\ny += x;\nx = y - x;\n" + printLine(language, "x") + "\n" + printLine(language, "y");
       answer = "x = " + y + ", y = " + (x + 2 * y);
       return makeItem("Assignments run top to bottom and use the latest values. What is the final pair?", code, answer,
         ["x = " + x + ", y = " + y, "x = " + (x + y) + ", y = " + (x + y),
@@ -369,8 +369,8 @@ document.addEventListener("DOMContentLoaded", function () {
       if (variant === 0) {
         const a = randomInt(random, 2, 7 + tier);
         const b = randomInt(random, 3, 8 + tier);
-        code = functionDefinition(language, "add", ["a", "b"], "a + b") + "\\n" +
-          declareInt(language, "result", 0).replace("0", "add(" + a + ", " + b + ")") + "\\n" +
+        code = functionDefinition(language, "add", ["a", "b"], "a + b") + "\n" +
+          declareInt(language, "result", 0).replace("0", "add(" + a + ", " + b + ")") + "\n" +
           printLine(language, "result");
         answer = a + b;
         return makeItem("The function returns a + b. What value reaches result?", code, answer,
@@ -380,8 +380,8 @@ document.addEventListener("DOMContentLoaded", function () {
       if (variant === 1) {
         const value = randomInt(random, 2, 3 + Math.min(1, tier));
         const answerValue = Math.pow(value, 4);
-        code = functionDefinition(language, "square", ["value"], "value * value") + "\\n" +
-          declareInt(language, "result", 0).replace("0", "square(square(" + value + "))") + "\\n" +
+        code = functionDefinition(language, "square", ["value"], "value * value") + "\n" +
+          declareInt(language, "result", 0).replace("0", "square(square(" + value + "))") + "\n" +
           printLine(language, "result");
         return makeItem("The function is called inside itself once. What does square(square(" + value + ")) return?", code,
           answerValue, [value * value, value * value * value, answerValue + value],
@@ -390,13 +390,13 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       const threshold = randomInt(random, 5, 8 + tier);
       if (language === "Python") {
-        code = "threshold = " + threshold + "\\ndef score(value):\\n    if value > threshold:\\n        return 2\\n    return 1\\nprint(score(threshold))";
+        code = "threshold = " + threshold + "\ndef score(value):\n    if value > threshold:\n        return 2\n    return 1\nprint(score(threshold))";
       } else if (language === "JavaScript") {
-        code = "let threshold = " + threshold + ";\\nfunction score(value) { if (value > threshold) { return 2; } return 1; }\\nconsole.log(score(threshold));";
+        code = "let threshold = " + threshold + ";\nfunction score(value) { if (value > threshold) { return 2; } return 1; }\nconsole.log(score(threshold));";
       } else {
-        code = "int threshold = " + threshold + ";\\nint score(int value) { if (value > threshold) { return 2; } return 1; }\\n" +
+        code = "int threshold = " + threshold + ";\nint score(int value) { if (value > threshold) { return 2; } return 1; }\n" +
           (language === "Java" ? "System.out.println(score(threshold));" :
-            language === "C" ? "printf(\"%d\\\\n\", score(threshold));" : "cout << score(threshold) << endl;");
+            language === "C" ? "printf(\"%d\\\n\", score(threshold));" : "cout << score(threshold) << endl;");
       }
       return makeItem("The input equals threshold exactly. Which return value is produced?", code, 1,
         [0, 2, threshold],
@@ -411,13 +411,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const truth = value >= low && value < high;
         const resultValue = truth ? 1 : 0;
         if (language === "Python") {
-          code = "value = " + value + "\\nlow = " + low + "\\nhigh = " + high +
-            "\\nif value >= low and value < high:\\n    result = 1\\nelse:\\n    result = 0\\nprint(result)";
+          code = "value = " + value + "\nlow = " + low + "\nhigh = " + high +
+            "\nif value >= low and value < high:\n    result = 1\nelse:\n    result = 0\nprint(result)";
         } else {
-          code = declareInt(language, "value", value) + "\\n" + declareInt(language, "low", low) + "\\n" +
-            declareInt(language, "high", high) + "\\n" +
-            "if (value >= low && value < high) { result = 1; } else { result = 0; }\\n" +
-            declareInt(language, "result", 0) + "\\n" + printLine(language, "result");
+          code = declareInt(language, "value", value) + "\n" + declareInt(language, "low", low) + "\n" +
+            declareInt(language, "high", high) + "\n" + declareInt(language, "result", 0) + "\n" +
+            "if (value >= low && value < high) { result = 1; } else { result = 0; }\n" +
+            printLine(language, "result");
         }
         return makeItem("Evaluate both parts of the condition. What value is printed?", code, resultValue,
           [resultValue === 1 ? 0 : 1, 2, -1],
@@ -427,11 +427,12 @@ document.addEventListener("DOMContentLoaded", function () {
       if (variant === 1) {
         const cutoff = randomInt(random, 40, 80);
         if (language === "Python") {
-          code = "score = " + cutoff + "\\nif score > " + cutoff + ":\\n    result = 2\\nelse:\\n    result = 1\\nprint(result)";
+          code = "score = " + cutoff + "\nif score > " + cutoff + ":\n    result = 2\nelse:\n    result = 1\nprint(result)";
         } else {
-          code = declareInt(language, "score", cutoff) + "\\n" +
-            "if (score > " + cutoff + ") { result = 2; } else { result = 1; }\\n" +
-            declareInt(language, "result", 0) + "\\n" + printLine(language, "result");
+          code = declareInt(language, "score", cutoff) + "\n" +
+            declareInt(language, "result", 0) + "\n" +
+            "if (score > " + cutoff + ") { result = 2; } else { result = 1; }\n" +
+            printLine(language, "result");
         }
         return makeItem("The score equals the cutoff. Does the strict greater-than branch run?", code, "No, the else branch runs.",
           ["Yes, because equality counts as greater-than.", "The code has no possible branch.", "It depends on the array length."],
@@ -441,11 +442,11 @@ document.addEventListener("DOMContentLoaded", function () {
       const value = randomInt(random, 2, 8) * divisor + randomInt(random, 0, divisor - 1);
       const resultValue = value % divisor === 0 ? 10 : 20;
       if (language === "Python") {
-        code = "value = " + value + "\\nif value % " + divisor + " == 0:\\n    result = 10\\nelse:\\n    result = 20\\nprint(result)";
+        code = "value = " + value + "\nif value % " + divisor + " == 0:\n    result = 10\nelse:\n    result = 20\nprint(result)";
       } else {
-        code = declareInt(language, "value", value) + "\\n" +
-          "if (value % " + divisor + " == 0) { result = 10; } else { result = 20; }\\n" +
-          declareInt(language, "result", 0) + "\\n" + printLine(language, "result");
+        code = declareInt(language, "value", value) + "\n" +
+          "if (value % " + divisor + " == 0) { result = 10; } else { result = 20; }\n" +
+          declareInt(language, "result", 0) + "\n" + printLine(language, "result");
       }
       return makeItem("The code checks whether value is divisible by " + divisor + ". What is printed?", code, resultValue,
         [resultValue === 10 ? 20 : 10, value, divisor],
@@ -456,19 +457,19 @@ document.addEventListener("DOMContentLoaded", function () {
       if (variant === 0) {
         const childValue = 2 + tier;
         if (language === "Python") {
-          code = "class Parent:\\n    def value(self):\\n        return 1\\n\\nclass Child(Parent):\\n    def value(self):\\n        return " + childValue +
-            "\\n\\nitem = Child()\\nprint(item.value())";
+          code = "class Parent:\n    def value(self):\n        return 1\n\nclass Child(Parent):\n    def value(self):\n        return " + childValue +
+            "\n\nitem = Child()\nprint(item.value())";
         } else if (language === "JavaScript") {
-          code = "class Parent { value() { return 1; } }\\nclass Child extends Parent { value() { return " + childValue +
-            "; } }\\nconst item = new Child();\\nconsole.log(item.value());";
+          code = "class Parent { value() { return 1; } }\nclass Child extends Parent { value() { return " + childValue +
+            "; } }\nconst item = new Child();\nconsole.log(item.value());";
         } else if (language === "Java") {
-          code = "class Parent { int value() { return 1; } }\\nclass Child extends Parent { @Override int value() { return " +
-            childValue + "; } }\\nParent item = new Child();\\nSystem.out.println(item.value());";
+          code = "class Parent { int value() { return 1; } }\nclass Child extends Parent { @Override int value() { return " +
+            childValue + "; } }\nParent item = new Child();\nSystem.out.println(item.value());";
         } else if (language === "C++") {
-          code = "struct Parent { virtual int value() { return 1; } };\\nstruct Child : Parent { int value() override { return " +
-            childValue + "; } };\\nChild item;\\ncout << item.value() << endl;";
+          code = "struct Parent { virtual int value() { return 1; } };\nstruct Child : Parent { int value() override { return " +
+            childValue + "; } };\nChild item;\ncout << item.value() << endl;";
         } else {
-          code = "struct Item { int value; };\\nstruct Item item = {" + childValue + "};\\nprintf(\"%d\\\\n\", item.value);";
+          code = "struct Item { int value; };\nstruct Item item = {" + childValue + "};\nprintf(\"%d\\\n\", item.value);";
         }
         return makeItem("Follow the object's actual type. What number is printed by the method or field read?", code, childValue,
           [1, childValue + 1, childValue * 2],
@@ -479,20 +480,20 @@ document.addEventListener("DOMContentLoaded", function () {
         const startingCoins = randomInt(random, 3, 8);
         const addedCoins = randomInt(random, 2, 4 + tier);
         if (language === "Python") {
-          code = "class Wallet:\\n    def __init__(self, coins):\\n        self.__coins = coins\\n    def add(self, amount):\\n        if amount > 0:\\n            self.__coins += amount\\n    def count(self):\\n        return self.__coins\\n\\nwallet = Wallet(" +
-            startingCoins + ")\\nwallet.add(" + addedCoins + ")\\nprint(wallet.count())";
+          code = "class Wallet:\n    def __init__(self, coins):\n        self.__coins = coins\n    def add(self, amount):\n        if amount > 0:\n            self.__coins += amount\n    def count(self):\n        return self.__coins\n\nwallet = Wallet(" +
+            startingCoins + ")\nwallet.add(" + addedCoins + ")\nprint(wallet.count())";
         } else if (language === "JavaScript") {
-          code = "class Wallet {\\n  constructor(coins) { this._coins = coins; }\\n  add(amount) { if (amount > 0) this._coins += amount; }\\n  count() { return this._coins; }\\n}\\nconst wallet = new Wallet(" +
-            startingCoins + ");\\nwallet.add(" + addedCoins + ");\\nconsole.log(wallet.count());";
+          code = "class Wallet {\n  constructor(coins) { this._coins = coins; }\n  add(amount) { if (amount > 0) this._coins += amount; }\n  count() { return this._coins; }\n}\nconst wallet = new Wallet(" +
+            startingCoins + ");\nwallet.add(" + addedCoins + ");\nconsole.log(wallet.count());";
         } else if (language === "Java") {
-          code = "class Wallet {\\n  private int coins;\\n  Wallet(int coins) { this.coins = coins; }\\n  void add(int amount) { if (amount > 0) coins += amount; }\\n  int count() { return coins; }\\n}\\nWallet wallet = new Wallet(" +
-            startingCoins + ");\\nwallet.add(" + addedCoins + ");\\nSystem.out.println(wallet.count());";
+          code = "class Wallet {\n  private int coins;\n  Wallet(int coins) { this.coins = coins; }\n  void add(int amount) { if (amount > 0) coins += amount; }\n  int count() { return coins; }\n}\nWallet wallet = new Wallet(" +
+            startingCoins + ");\nwallet.add(" + addedCoins + ");\nSystem.out.println(wallet.count());";
         } else if (language === "C") {
-          code = "struct Wallet { int coins; };\\nvoid add(struct Wallet *wallet, int amount) { if (amount > 0) wallet->coins += amount; }\\nstruct Wallet wallet = {" +
-            startingCoins + "};\\nadd(&wallet, " + addedCoins + ");\\nprintf(\"%d\\\\n\", wallet.coins);";
+          code = "struct Wallet { int coins; };\nvoid add(struct Wallet *wallet, int amount) { if (amount > 0) wallet->coins += amount; }\nstruct Wallet wallet = {" +
+            startingCoins + "};\nadd(&wallet, " + addedCoins + ");\nprintf(\"%d\\\n\", wallet.coins);";
         } else {
-          code = "class Wallet { int coins; public: Wallet(int value) : coins(value) {} void add(int amount) { if (amount > 0) coins += amount; } int count() { return coins; } };\\nWallet wallet(" +
-            startingCoins + ");\\nwallet.add(" + addedCoins + ");\\ncout << wallet.count() << endl;";
+          code = "class Wallet { int coins; public: Wallet(int value) : coins(value) {} void add(int amount) { if (amount > 0) coins += amount; } int count() { return coins; } };\nWallet wallet(" +
+            startingCoins + ");\nwallet.add(" + addedCoins + ");\ncout << wallet.count() << endl;";
         }
         answer = startingCoins + addedCoins;
         return makeItem("The add method ignores non-positive amounts. What count is returned here?", code, answer,
@@ -503,20 +504,20 @@ document.addEventListener("DOMContentLoaded", function () {
       const second = randomInt(random, 8, 12);
       const delta = randomInt(random, 1, 3 + tier);
       if (language === "Python") {
-        code = "class Box:\\n    def __init__(self, value):\\n        self.value = value\\n\\nfirst = Box(" + first +
-          ")\\nsecond = Box(" + second + ")\\nfirst.value += " + delta + "\\nprint(second.value)";
+        code = "class Box:\n    def __init__(self, value):\n        self.value = value\n\nfirst = Box(" + first +
+          ")\nsecond = Box(" + second + ")\nfirst.value += " + delta + "\nprint(second.value)";
       } else if (language === "JavaScript") {
-        code = "class Box { constructor(value) { this.value = value; } }\\nconst first = new Box(" + first +
-          ");\\nconst second = new Box(" + second + ");\\nfirst.value += " + delta + ";\\nconsole.log(second.value);";
+        code = "class Box { constructor(value) { this.value = value; } }\nconst first = new Box(" + first +
+          ");\nconst second = new Box(" + second + ");\nfirst.value += " + delta + ";\nconsole.log(second.value);";
       } else if (language === "Java") {
-        code = "class Box { int value; Box(int value) { this.value = value; } }\\nBox first = new Box(" + first +
-          ");\\nBox second = new Box(" + second + ");\\nfirst.value += " + delta + ";\\nSystem.out.println(second.value);";
+        code = "class Box { int value; Box(int value) { this.value = value; } }\nBox first = new Box(" + first +
+          ");\nBox second = new Box(" + second + ");\nfirst.value += " + delta + ";\nSystem.out.println(second.value);";
       } else if (language === "C") {
-        code = "struct Box { int value; };\\nstruct Box first = {" + first + "};\\nstruct Box second = {" + second +
-          "};\\nfirst.value += " + delta + ";\\nprintf(\"%d\\\\n\", second.value);";
+        code = "struct Box { int value; };\nstruct Box first = {" + first + "};\nstruct Box second = {" + second +
+          "};\nfirst.value += " + delta + ";\nprintf(\"%d\\\n\", second.value);";
       } else {
-        code = "struct Box { int value; };\\nBox first{" + first + "};\\nBox second{" + second +
-          "};\\nfirst.value += " + delta + ";\\ncout << second.value << endl;";
+        code = "struct Box { int value; };\nBox first{" + first + "};\nBox second{" + second +
+          "};\nfirst.value += " + delta + ";\ncout << second.value << endl;";
       }
       return makeItem("Two objects are created. Updating first does not update second. What is printed?", code, second,
         [first, first + delta, second + delta],
@@ -530,16 +531,16 @@ document.addEventListener("DOMContentLoaded", function () {
         const active = values.slice(0, count);
         answer = active[active.length - 1];
         if (language === "Python") {
-          code = "stack = []\\n" + active.map(function (value) { return "stack.append(" + value + ")"; }).join("\\n") +
-            "\\nremoved = stack.pop()\\nprint(removed)";
+          code = "stack = []\n" + active.map(function (value) { return "stack.append(" + value + ")"; }).join("\n") +
+            "\nremoved = stack.pop()\nprint(removed)";
         } else if (language === "JavaScript") {
-          code = "const stack = [];\\n" + active.map(function (value) { return "stack.push(" + value + ");"; }).join("\\n") +
-            "\\nconst removed = stack.pop();\\nconsole.log(removed);";
+          code = "const stack = [];\n" + active.map(function (value) { return "stack.push(" + value + ");"; }).join("\n") +
+            "\nconst removed = stack.pop();\nconsole.log(removed);";
         } else {
           const arrType = language === "Java" ? "int[] stack = new int[4];" : "int stack[4];";
-          code = arrType + "\\nint top = -1;\\n" +
-            active.map(function (value) { return "stack[++top] = " + value + ";"; }).join("\\n") +
-            "\\nint removed = stack[top--];\\n" + printLine(language, "removed");
+          code = arrType + "\nint top = -1;\n" +
+            active.map(function (value) { return "stack[++top] = " + value + ";"; }).join("\n") +
+            "\nint removed = stack[top--];\n" + printLine(language, "removed");
         }
         return makeItem("A stack uses last-in, first-out. Which value is removed by pop?", code, answer,
           [active[0], active[Math.max(0, active.length - 2)], active[0] + answer],
@@ -550,11 +551,11 @@ document.addEventListener("DOMContentLoaded", function () {
           randomInt(random, 8, 10), randomInt(random, 11, 14)];
         answer = values[0];
         if (language === "Python") {
-          code = "queue = " + arrayText(values) + "\\nremoved = queue.pop(0)\\nprint(removed)";
+          code = "queue = " + arrayText(values) + "\nremoved = queue.pop(0)\nprint(removed)";
         } else if (language === "JavaScript") {
-          code = "const queue = " + arrayText(values) + ";\\nconst removed = queue.shift();\\nconsole.log(removed);";
+          code = "const queue = " + arrayText(values) + ";\nconst removed = queue.shift();\nconsole.log(removed);";
         } else {
-          code = arrayDeclaration(language, values, "queue") + "\\nint front = 0;\\nint removed = queue[front++];\\n" +
+          code = arrayDeclaration(language, values, "queue") + "\nint front = 0;\nint removed = queue[front++];\n" +
             printLine(language, "removed");
         }
         return makeItem("A queue uses first-in, first-out. Which value is removed first?", code, answer,
@@ -562,17 +563,17 @@ document.addEventListener("DOMContentLoaded", function () {
           "The front of the queue is the first item inserted, which is " + answer + ".", random);
       }
       const values = [3, 6, 9, 12, 15];
-      const remainingIndex = tier >= 2 ? 2 : 1;
-      answer = values[remainingIndex];
+      const popCount = tier >= 2 ? 2 : 3;
+      answer = values[values.length - 1 - popCount];
       if (language === "Python") {
-        code = "stack = " + arrayText(values) + "\\nstack.pop()\\nstack.pop()\\nprint(stack[-1])";
+        code = "stack = " + arrayText(values) + "\nfor _ in range(" + popCount + "):\n    stack.pop()\nprint(stack[-1])";
       } else if (language === "JavaScript") {
-        code = "const stack = " + arrayText(values) + ";\\nstack.pop();\\nstack.pop();\\nconsole.log(stack[stack.length - 1]);";
+        code = "const stack = " + arrayText(values) + ";\nfor (let i = 0; i < " + popCount + "; i += 1) { stack.pop(); }\nconsole.log(stack[stack.length - 1]);";
       } else {
-        code = arrayDeclaration(language, values, "stack") + "\\nint top = 4;\\ntop -= 1;\\ntop -= 1;\\n" +
-          "int result = stack[top];\\n" + printLine(language, "result");
+        code = arrayDeclaration(language, values, "stack") + "\nint top = 4;\ntop -= " + popCount + ";\n" +
+          "int result = stack[top];\n" + printLine(language, "result");
       }
-      return makeItem("Two items are removed from the top. Which value is now at the top?", code, answer,
+      return makeItem("Several items are removed from the top. Which value is now at the top?", code, answer,
         [values[0], values[3], values[4]],
         "After two pops, the last two values are gone. The remaining top value is " + answer + ".", random);
     }
@@ -586,13 +587,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const target = values[targetIndex];
         answer = targetIndex + 1;
         if (language === "Python") {
-          code = arrayDeclaration(language, values) + "\\ntarget = " + target +
-            "\\nchecks = 0\\nfor value in values:\\n    checks += 1\\n    if value == target:\\n        break\\nprint(checks)";
+          code = arrayDeclaration(language, values) + "\ntarget = " + target +
+            "\nchecks = 0\nfor value in values:\n    checks += 1\n    if value == target:\n        break\nprint(checks)";
         } else {
-          code = arrayDeclaration(language, values) + "\\n" + declareInt(language, "target", target) + "\\n" +
-            declareInt(language, "checks", 0) + "\\n" +
+          code = arrayDeclaration(language, values) + "\n" + declareInt(language, "target", target) + "\n" +
+            declareInt(language, "checks", 0) + "\n" +
             forLoop(language, "i", 0, values.length, 1, ["checks += 1;", "if (values[i] == target) { break; }"]) +
-            "\\n" + printLine(language, "checks");
+            "\n" + printLine(language, "checks");
         }
         return makeItem("A linear scan stops when it finds target. How many comparisons happen?", code, answer,
           [length, Math.max(1, answer - 1), answer + 1],
@@ -616,16 +617,16 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         answer = steps;
         const findLoop = language === "Python"
-          ? "while low <= high:\\n    steps += 1\\n    mid = (low + high) // 2\\n    if values[mid] == target:\\n        break\\n    if values[mid] < target:\\n        low = mid + 1\\n    else:\\n        high = mid - 1"
-          : "while (low <= high) {\\n    steps += 1;\\n    int mid = (low + high) / 2;\\n    if (values[mid] == target) { break; }\\n    if (values[mid] < target) { low = mid + 1; } else { high = mid - 1; }\\n}";
+          ? "while low <= high:\n    steps += 1\n    mid = (low + high) // 2\n    if values[mid] == target:\n        break\n    if values[mid] < target:\n        low = mid + 1\n    else:\n        high = mid - 1"
+          : "while (low <= high) {\n    steps += 1;\n    int mid = (low + high) / 2;\n    if (values[mid] == target) { break; }\n    if (values[mid] < target) { low = mid + 1; } else { high = mid - 1; }\n}";
         if (language === "Python") {
-          code = arrayDeclaration(language, values) + "\\ntarget = " + target + "\\nlow = 0\\nhigh = " + (size - 1) +
-            "\\nsteps = 0\\n" + findLoop + "\\nprint(steps)";
+          code = arrayDeclaration(language, values) + "\ntarget = " + target + "\nlow = 0\nhigh = " + (size - 1) +
+            "\nsteps = 0\n" + findLoop + "\nprint(steps)";
         } else {
-          code = arrayDeclaration(language, values) + "\\n" + declareInt(language, "target", target) + "\\n" +
-            declareInt(language, "low", 0) + "\\n" + declareInt(language, "high", size - 1) + "\\n" +
-            declareInt(language, "steps", 0) + "\\n" +
-            findLoop.replace("int mid", language === "JavaScript" ? "let mid" : "int mid") + "\\n" +
+          code = arrayDeclaration(language, values) + "\n" + declareInt(language, "target", target) + "\n" +
+            declareInt(language, "low", 0) + "\n" + declareInt(language, "high", size - 1) + "\n" +
+            declareInt(language, "steps", 0) + "\n" +
+            findLoop.replace("int mid", language === "JavaScript" ? "let mid" : "int mid") + "\n" +
             printLine(language, "steps");
         }
         return makeItem("Trace the sorted-array binary search. How many loop checks happen before target is found?", code, answer,
@@ -635,12 +636,12 @@ document.addEventListener("DOMContentLoaded", function () {
       const n = randomInt(random, 3 + tier, 5 + tier);
       answer = "O(n²)";
       if (language === "Python") {
-        code = "operations = 0\\nn = " + n + "\\nfor i in range(n):\\n    for j in range(n):\\n        operations += 1\\nprint(operations)";
+        code = "operations = 0\nn = " + n + "\nfor i in range(n):\n    for j in range(n):\n        operations += 1\nprint(operations)";
       } else {
         const type = language === "JavaScript" ? "let " : "int ";
-        code = type + "operations = 0;\\n" + declareInt(language, "n", n) + "\\n" +
-          "for (" + type + "i = 0; i < n; i += 1) {\\n    for (" + type +
-          "j = 0; j < n; j += 1) { operations += 1; }\\n}\\n" + printLine(language, "operations");
+        code = type + "operations = 0;\n" + declareInt(language, "n", n) + "\n" +
+          "for (" + type + "i = 0; i < n; i += 1) {\n    for (" + type +
+          "j = 0; j < n; j += 1) { operations += 1; }\n}\n" + printLine(language, "operations");
       }
       return makeItem("The two loops each visit n items. What is the time complexity as n grows?", code, answer,
         ["O(n)", "O(n log n)", "O(1)"],
@@ -649,14 +650,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (variant === 0) {
       if (language === "Python") {
-        code = "def average(values):\\n    total = 0\\n    for value in values:\\n        total += value\\n    return total / len(values)\\n\\nprint(average([]))";
+        code = "def average(values):\n    total = 0\n    for value in values:\n        total += value\n    return total / len(values)\n\nprint(average([]))";
       } else if (language === "JavaScript") {
-        code = "function average(values) {\\n  let total = 0;\\n  for (const value of values) { total += value; }\\n  return total / values.length;\\n}\\nconsole.log(average([]));";
+        code = "function average(values) {\n  let total = 0;\n  for (const value of values) { total += value; }\n  return total / values.length;\n}\nconsole.log(average([]));";
       } else if (language === "Java") {
-        code = "int average(int[] values) {\\n  int total = 0;\\n  for (int value : values) { total += value; }\\n  return total / values.length;\\n}\\nint[] values = new int[0];\\nSystem.out.println(average(values));";
+        code = "int average(int[] values) {\n  int total = 0;\n  for (int value : values) { total += value; }\n  return total / values.length;\n}\nint[] values = new int[0];\nSystem.out.println(average(values));";
       } else {
-        code = "int average(int values[], int length) {\\n  int total = 0;\\n  for (int i = 0; i < length; i += 1) { total += values[i]; }\\n  return total / length;\\n}\\nint length = 0;\\nint values[1] = {0};\\nprintf(\"%d\\\\n\", average(values, length));";
-        if (language === "C++") code = code.replace("printf(\"%d\\\\n\", average(values, length));", "cout << average(values, length) << endl;");
+        code = "int average(int values[], int length) {\n  int total = 0;\n  for (int i = 0; i < length; i += 1) { total += values[i]; }\n  return total / length;\n}\nint length = 0;\nint values[1] = {0};\nprintf(\"%d\\\n\", average(values, length));";
+        if (language === "C++") code = code.replace("printf(\"%d\\\n\", average(values, length));", "cout << average(values, length) << endl;");
       }
       return makeItem("Which input exposes an edge case that this average function does not handle?", code,
         "An empty array or list, because its length is zero.",
@@ -666,11 +667,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (variant === 1) {
       const values = [8, 2, 10, 5];
       if (language === "Python") {
-        code = "values = [8, 2, 10, 5]\\ntarget = 10\\nlow = 0\\nhigh = len(values) - 1\\nwhile low <= high:\\n    mid = (low + high) // 2\\n    if values[mid] == target:\\n        break\\n    if values[mid] < target:\\n        low = mid + 1\\n    else:\\n        high = mid - 1";
+        code = "values = [8, 2, 10, 5]\ntarget = 10\nlow = 0\nhigh = len(values) - 1\nwhile low <= high:\n    mid = (low + high) // 2\n    if values[mid] == target:\n        break\n    if values[mid] < target:\n        low = mid + 1\n    else:\n        high = mid - 1";
       } else {
-        code = arrayDeclaration(language, values) + "\\n" + declareInt(language, "target", 10) + "\\n" +
-          declareInt(language, "low", 0) + "\\n" + declareInt(language, "high", values.length - 1) + "\\n" +
-          "while (low <= high) {\\n    int mid = (low + high) / 2;\\n    if (values[mid] == target) { break; }\\n    if (values[mid] < target) { low = mid + 1; } else { high = mid - 1; }\\n}";
+        code = arrayDeclaration(language, values) + "\n" + declareInt(language, "target", 10) + "\n" +
+          declareInt(language, "low", 0) + "\n" + declareInt(language, "high", values.length - 1) + "\n" +
+          "while (low <= high) {\n    int mid = (low + high) / 2;\n    if (values[mid] == target) { break; }\n    if (values[mid] < target) { low = mid + 1; } else { high = mid - 1; }\n}";
         if (language === "JavaScript") code = code.replace("int mid", "let mid");
       }
       return makeItem("This code uses binary search on [8, 2, 10, 5]. Which requirement is broken?", code,
@@ -680,12 +681,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     const values = [3, 7, 11];
     if (language === "Python") {
-      code = "values = [3, 7, 11]\\nfor i in range(0, len(values) + 1):\\n    print(values[i])";
+      code = "values = [3, 7, 11]\nfor i in range(0, len(values) + 1):\n    print(values[i])";
     } else {
-      code = arrayDeclaration(language, values) + "\\n" +
-        "for (int i = 0; i <= " + values.length + "; i += 1) { " +
+      code = arrayDeclaration(language, values) + "\n" +
+        "for (" + (language === "JavaScript" ? "let " : "int ") + "i = 0; i <= " + values.length + "; i += 1) { " +
         (language === "JavaScript" ? "console.log(values[i]);" : language === "Java" ? "System.out.println(values[i]);" :
-          language === "C" ? "printf(\"%d\\\\n\", values[i]);" : "cout << values[i] << endl;") + " }";
+          language === "C" ? "printf(\"%d\\\n\", values[i]);" : "cout << values[i] << endl;") + " }";
     }
     return makeItem("Which change would fix the out-of-range access in this loop?", code,
       "Change the condition so i is strictly less than the array length.",
