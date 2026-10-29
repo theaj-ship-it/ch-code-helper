@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#03070d">
+  <meta name="description" content="A local launch planner for introducing cH Code Helper to programming learners and maker communities.">
+  <title>Creator Launch Kit | cH Code Helper</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #03070d;
+      --panel: rgba(10, 15, 23, .94);
+      --panel-2: #101924;
+      --line: rgba(112, 168, 188, .24);
+      --text: #f2f5f7;
+      --muted: #a9b7c3;
+      --cyan: #8be0f0;
+      --gold: #f0cf7b;
+      --green: #8bdfb1;
+      --red: #ffb0b0;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; min-height: 100vh; color: var(--text);
+      background: radial-gradient(ellipse at 50% -10%, rgba(18, 94, 128, .26), transparent 52%), var(--bg);
+      font: 16px/1.6 Inter, "Segoe UI", Arial, sans-serif;
+    }
+    a { color: var(--cyan); text-underline-offset: 3px; }
+    button, input, textarea, select { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    .wrap { width: min(1120px, calc(100% - 32px)); margin: auto; }
+    header { padding: 38px 0 20px; }
+    .topline { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .eyebrow { margin: 0; color: var(--cyan); font-size: .72rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
+    .back-link { font-size: .88rem; }
+    h1 { max-width: 780px; margin: 24px 0 12px; font-size: clamp(2.1rem, 6vw, 4.3rem); line-height: 1.05; letter-spacing: -.055em; }
+    h1 span { color: var(--cyan); }
+    .lede { max-width: 760px; color: var(--muted); font-size: 1.04rem; }
+    .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 22px 0; }
+    .button, button {
+      display: inline-flex; justify-content: center; align-items: center; gap: 8px;
+      min-height: 43px; padding: 10px 14px; border: 1px solid #3b7183; border-radius: 11px;
+      color: #061017; background: var(--cyan); font-weight: 800; text-decoration: none; cursor: pointer;
+    }
+    .button.secondary, button.secondary { color: var(--text); background: #111923; border-color: var(--line); }
+    button:hover, .button:hover { filter: brightness(1.08); }
+    button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+      outline: 2px solid var(--gold); outline-offset: 3px;
+    }
+    .notice {
+      margin: 22px 0; padding: 14px 16px; border: 1px solid rgba(240, 207, 123, .28);
+      border-radius: 13px; color: #e8dfc7; background: rgba(91, 73, 29, .14);
+    }
+    .notice strong { color: var(--gold); }
+    main { padding-bottom: 60px; }
+    .summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }
+    .metric, .planner-card, .platform-card, .checklist-card {
+      min-width: 0; border: 1px solid var(--line); border-radius: 17px;
+      background: var(--panel); box-shadow: 0 14px 38px rgba(0,0,0,.17);
+    }
+    .metric { padding: 16px; }
+    .metric .label { display: block; color: var(--muted); font-size: .78rem; }
+    .metric strong { display: block; margin: 2px 0; font-size: 1.8rem; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+    .metric small { color: var(--muted); }
+    .progress-track { height: 8px; overflow: hidden; margin-top: 10px; border-radius: 999px; background: #1d2933; }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #61c9df, #b8efd4); transition: width .2s ease; }
+    .planner-card, .checklist-card { margin: 16px 0; padding: clamp(17px, 3vw, 24px); }
+    .section-head { display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 12px; }
+    h2 { margin: 0; font-size: clamp(1.22rem, 3vw, 1.65rem); letter-spacing: -.025em; }
+    .section-head p { margin: 5px 0 0; color: var(--muted); }
+    .date-field { min-width: min(100%, 260px); display: grid; gap: 6px; }
+    label { color: #e3ebf0; font-size: .84rem; font-weight: 700; }
+    input, textarea, select {
+      width: 100%; min-width: 0; padding: 10px 11px; border: 1px solid #344754; border-radius: 9px;
+      color: var(--text); background: #08111a;
+    }
+    textarea { min-height: 108px; resize: vertical; line-height: 1.5; }
+    .helper { margin: 12px 0 0; color: var(--muted); font-size: .83rem; }
+    .platform-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 15px; }
+    .platform-card { display: flex; flex-direction: column; gap: 14px; padding: clamp(15px, 2.5vw, 22px); }
+    .platform-head { display: flex; align-items: flex-start; gap: 12px; }
+    .platform-mark {
+      display: grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px;
+      border: 1px solid rgba(139, 224, 240, .28); border-radius: 12px; color: var(--cyan); background: #0d202a;
+      font-size: .82rem; font-weight: 900;
+    }
+    .platform-head h3 { margin: 0; font-size: 1.08rem; }
+    .platform-head p { margin: 3px 0 0; color: var(--muted); font-size: .86rem; }
+    .field { display: grid; gap: 6px; }
+    .field-label-row { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .field-label-row span { color: var(--muted); font-size: .74rem; }
+    .draft-tools { display: flex; gap: 8px; flex-wrap: wrap; }
+    .draft-tools button { flex: 1 1 120px; }
+    .platform-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: auto; }
+    .platform-actions .button { flex: 1 1 140px; }
+    .status-line { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .status-line select { max-width: 185px; padding: 8px; font-size: .8rem; }
+    .status-indicator { width: 8px; height: 8px; display: inline-block; border-radius: 50%; background: #647681; margin-right: 7px; }
+    .status-indicator.is-ready { background: var(--gold); }
+    .status-indicator.is-live { background: var(--green); }
+    .status-indicator.is-done { background: var(--cyan); }
+    .metrics-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .metrics-grid input { padding: 8px; font-size: .9rem; }
+    .mini-checks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+    .check-row { display: flex; align-items: flex-start; gap: 9px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: #0a121a; }
+    .check-row input { flex: 0 0 auto; width: 17px; height: 17px; margin: 4px 0 0; accent-color: #8be0f0; }
+    .check-row span { font-size: .9rem; }
+    .check-row small { display: block; color: var(--muted); font-size: .78rem; }
+    .utility-row { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 18px; }
+    .save-status { min-height: 1.4em; margin: 12px 0 0; color: var(--green); font-size: .84rem; }
+    footer { padding: 0 0 30px; color: var(--muted); font-size: .84rem; }
+    footer p { margin: 8px 0; }
+    [hidden] { display: none !important; }
+    @media (max-width: 760px) {
+      .platform-grid { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 480px) {
+      .wrap { width: min(100% - 22px, 1120px); }
+      header { padding-top: 26px; }
+      .summary-grid { gap: 8px; }
+      .metric { padding: 12px; }
+      .metric strong { font-size: 1.5rem; }
+      .mini-checks { grid-template-columns: 1fr; }
+      .metrics-grid { grid-template-columns: 1fr; }
+      .platform-actions .button, .draft-tools button { flex-basis: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="wrap">
+    <div class="topline">
+      <p class="eyebrow">cH CREATOR TOOLS · GROWTH WORKSPACE</p>
+      <a class="back-link" href="index.html">← Back to cH Code Helper</a>
+    </div>
+    <h1>Help the right learners <span>find cH.</span></h1>
+    <p class="lede">A practical launch workspace inspired by the video: prepare posts for five discovery platforms, plan a launch date, and record actual responses. Start with useful conversations, not spam.</p>
+    <div class="hero-actions">
+      <a class="button" href="https://theaj-ship-it.github.io/ch-code-helper/" target="_blank" rel="noopener noreferrer">Open live cH website ↗</a>
+      <a class="button secondary" href="#platforms">Go to launch platforms ↓</a>
+    </div>
+    <div class="notice"><strong>Important:</strong> This page prepares drafts and tracks figures you enter yourself. It does not publish posts, connect to platform accounts, or fetch live analytics. Always read each community's rules before posting. Never ask people to upvote in exchange for anything.</div>
+  </header>
+
+  <main class="wrap">
+    <section class="summary-grid" aria-label="Launch progress summary">
+      <div class="metric"><span class="label">Platforms prepared</span><strong id="prepared-count">0/5</strong><small>Drafted, posted, or followed up</small><div class="progress-track" role="progressbar" aria-label="Launch preparation" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0" id="progress-track"><div class="progress-fill" id="progress-fill"></div></div></div>
+      <div class="metric"><span class="label">Recorded visits</span><strong id="total-visits">0</strong><small>Manual entries only</small></div>
+      <div class="metric"><span class="label">Conversations</span><strong id="total-replies">0</strong><small>Replies or feedback</small></div>
+      <div class="metric"><span class="label">Learners reached</span><strong id="total-learners">0</strong><small>Confirmed by you</small></div>
+    </section>
+
+    <section class="planner-card" aria-labelledby="plan-title">
+      <div class="section-head">
+        <div><h2 id="plan-title">Plan the launch</h2><p>Keep the date and task progress in this browser.</p></div>
+        <div class="date-field"><label for="launch-date">Target launch date (optional)</label><input type="date" id="launch-date"></div>
+      </div>
+      <p class="helper">Product Hunt scheduling and the Uneed launch queue are separate from this planner. The date here is your reminder, not a reservation or submission.</p>
+    </section>
+
+    <section id="platforms" aria-labelledby="platforms-title">
+      <div class="section-head">
+        <div><h2 id="platforms-title">Five places to introduce cH</h2><p>Personalize each draft before you copy and post it yourself.</p></div>
+      </div>
+      <div id="platform-grid" class="platform-grid">
+        <p>Loading your local launch workspace…</p>
+      </div>
+    </section>
+
+    <section class="checklist-card" aria-labelledby="checklist-title">
+      <div class="section-head"><div><h2 id="checklist-title">Before you launch</h2><p>Check these basics before sharing cH widely.</p></div></div>
+      <div id="launch-checklist" class="mini-checks">
+        <label class="check-row"><input type="checkbox" data-check="site"><span>Test the live website on mobile and desktop<small>Check the tutor, Logic Sprint, and Code Detective.</small></span></label>
+        <label class="check-row"><input type="checkbox" data-check="demo"><span>Capture clear product screenshots or a demo<small>Show the actual learning flow, not a mockup.</small></span></label>
+        <label class="check-row"><input type="checkbox" data-check="rules"><span>Read each platform's latest rules<small>Follow posting requirements and disclose that you built cH.</small></span></label>
+        <label class="check-row"><input type="checkbox" data-check="feedback"><span>Prepare one useful feedback question<small>Ask what is confusing or missing, not for votes.</small></span></label>
+        <label class="check-row"><input type="checkbox" data-check="support"><span>Reserve time to reply to questions<small>Respond with helpful details and honest limitations.</small></span></label>
+        <label class="check-row"><input type="checkbox" data-check="privacy"><span>Review privacy and API usage limits<small>Do not publish secrets, private student data, or API keys.</small></span></label>
+      </div>
+      <div class="utility-row">
+        <button id="export-plan" type="button">Export launch plan (.json)</button>
+        <button id="reset-plan" class="secondary" type="button">Reset local plan</button>
+      </div>
+      <p id="save-status" class="save-status" role="status" aria-live="polite">Your plan stays in this browser.</p>
+      <p class="helper">Storage note: drafts, status, dates, checklist, and metrics are saved in this browser's local storage. They are not synced to your phone or another browser, and no posting or analytics API is called by this page.</p>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <p>cH Code Helper · Learn the logic. Build it yourself.</p>
+    <p><a href="index.html">Return to the learning space</a></p>
+  </footer>
+
+  <script>
+    "use strict";
+    (() => {
+      const STORAGE_KEY = "ch-code-helper-launch-kit-v1";
+      const PROJECT_URL = "https://theaj-ship-it.github.io/ch-code-helper/";
+      const platforms = [
+        {
+          id: "reddit", name: "Reddit · r/SideProject", mark: "R/",
+          tagline: "Share the maker story and ask for specific feedback.",
+          url: "https://www.reddit.com/r/SideProject/",
+          guide: "https://www.reddit.com/r/SideProject/about/rules/",
+          title: "I built cH Code Helper to help beginners understand coding logic. Feedback welcome",
+          body: "Hi everyone, I'm building cH Code Helper, a programming-learning tool for beginners who want to understand the logic before copying code. It has guided lessons, daily code-tracing practice, and Code Detective cases across Python, Java, JavaScript, C, and C++.\\n\\nI'm still improving it and would appreciate honest feedback: which part of the learning flow is confusing, and what would make it more useful for a student?\\n\\nTry it here: " + PROJECT_URL + "\\n\\nI'm the maker of the project, and I'll be around to answer questions."
+        },
+        {
+          id: "hackernews", name: "Hacker News · Show HN", mark: "HN",
+          tagline: "Let people try the working product and discuss how it was built.",
+          url: "https://news.ycombinator.com/submit",
+          guide: "https://news.ycombinator.com/showhn.html",
+          title: "Show HN: cH Code Helper – a step-by-step programming tutor",
+          body: "I built cH Code Helper because beginners can often find code examples but still struggle to reason through a problem. The site turns a programming question into learning steps, and includes an offline Logic Sprint plus Code Detective cases for tracing and inspecting snippets.\\n\\nIt currently supports examples in Python, Java, JavaScript, C, and C++. The exercises display code for analysis; they do not execute submitted code.\\n\\nLive demo: " + PROJECT_URL + "\\n\\nI'd value feedback on the teaching flow, the exercises, and what would make the tool more useful. I built this project and can answer questions about its design and limitations."
+        },
+        {
+          id: "producthunt", name: "Product Hunt", mark: "PH",
+          tagline: "Prepare a product listing and choose a launch date on the platform.",
+          url: "https://www.producthunt.com/",
+          guide: "https://help.producthunt.com/en/articles/17350772-launch-guide",
+          title: "cH Code Helper",
+          body: "Tagline: Learn coding logic step by step\\n\\nDescription: cH Code Helper is an AI-assisted programming tutor for beginners. It breaks questions into clear learning steps and adds daily code-tracing and Code Detective practice, helping students reason about code instead of only copying it.\\n\\nMaker comment: I started building cH to help programming learners understand the logic behind a solution. The current site includes guided lessons, daily practice across five languages, and code-investigation cases. I'd welcome feedback on what is useful, what is unclear, and what learners need next.\\n\\nTry it: " + PROJECT_URL
+        },
+        {
+          id: "indiehackers", name: "Indie Hackers", mark: "IH",
+          tagline: "Tell the build-in-public story and discuss lessons learned.",
+          url: "https://www.indiehackers.com/",
+          guide: "https://www.indiehackers.com/",
+          title: "Building cH Code Helper: helping beginners reason about code, not just copy it",
+          body: "I'm building cH Code Helper, a learning assistant for engineering students and new programmers. The goal is to make the reasoning visible before the final code: concept, steps, example, then practice. I added a daily Logic Sprint and a Code Detective mode to turn code-reading into small investigations.\\n\\nThe live prototype is here: " + PROJECT_URL + "\\n\\nI'd love to hear how other makers validate a learning product with real beginners. Which onboarding step or exercise should I improve first? I'll share what I learn and the changes that follow."
+        },
+        {
+          id: "uneed", name: "Uneed", mark: "U",
+          tagline: "Submit a product listing and review the details before scheduling.",
+          url: "https://www.uneed.best/submit-a-tool/",
+          guide: "https://help.uneed.best/getting-started/how-to-submit-your-first-product",
+          title: "cH Code Helper — step-by-step programming learning",
+          body: "cH Code Helper is an AI-assisted programming tutor for beginners. It explains the reasoning behind coding concepts, provides structured learning steps, and offers daily practice through Logic Sprint and Code Detective. It currently covers Python, Java, JavaScript, C, and C++.\\n\\nWebsite: " + PROJECT_URL + "\\n\\nThe project is evolving through learner feedback. Suggestions about clarity, accessibility, and useful beginner exercises are welcome."
+        }
+      ];
+      const statusOptions = [
+        ["todo", "Not started"],
+        ["drafted", "Draft ready"],
+        ["published", "Posted"],
+        ["followedup", "Follow-up done"]
+      ];
+      const defaultChecklist = { site: false, demo: false, rules: false, feedback: false, support: false, privacy: false };
+      const $ = (id) => document.getElementById(id);
+      const grid = $("platform-grid");
+      const statusMessage = $("save-status");
+      let saveTimer = 0;
+      let state = readState();
+
+      function numeric(value) {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? Math.max(0, Math.floor(parsed)) : 0;
+      }
+      function freshState() {
+        const savedPlatforms = {};
+        platforms.forEach((platform) => {
+          savedPlatforms[platform.id] = {
+            status: "todo", title: platform.title, body: platform.body,
+            visits: 0, replies: 0, learners: 0
+          };
+        });
+        return { launchDate: "", platforms: savedPlatforms, checklist: { ...defaultChecklist } };
+      }
+      function readState() {
+        const fresh = freshState();
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return fresh;
+          const saved = JSON.parse(raw);
+          if (!saved || typeof saved !== "object") return fresh;
+          fresh.launchDate = typeof saved.launchDate === "string" ? saved.launchDate : "";
+          platforms.forEach((platform) => {
+            const item = saved.platforms && saved.platforms[platform.id];
+            if (!item || typeof item !== "object") return;
+            fresh.platforms[platform.id] = {
+              status: statusOptions.some((option) => option[0] === item.status) ? item.status : "todo",
+              title: typeof item.title === "string" ? item.title.slice(0, 240) : platform.title,
+              body: typeof item.body === "string" ? item.body.slice(0, 5000) : platform.body,
+              visits: numeric(item.visits), replies: numeric(item.replies), learners: numeric(item.learners)
+            };
+          });
+          if (saved.checklist && typeof saved.checklist === "object") {
+            Object.keys(defaultChecklist).forEach((key) => { fresh.checklist[key] = saved.checklist[key] === true; });
+          }
+          return fresh;
+        } catch (_) {
+          return fresh;
+        }
+      }
+      function persist(message) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          statusMessage.textContent = message || "Saved in this browser.";
+          statusMessage.style.color = "var(--green)";
+        } catch (_) {
+          statusMessage.textContent = "Browser storage is unavailable. Export your plan to keep a copy.";
+          statusMessage.style.color = "var(--gold)";
+        }
+        renderSummary();
+      }
+      function make(tag, className, text) {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        if (text !== undefined) node.textContent = text;
+        return node;
+      }
+      function appendField(parent, id, labelText, value, type) {
+        const wrap = make("div", "field");
+        const label = make("label", "", labelText);
+        label.htmlFor = id;
+        const input = type === "textarea" ? make("textarea") : make("input");
+        input.id = id;
+        input.value = value;
+        if (type !== "textarea") input.type = type || "text";
+        if (type === "number") {
+          input.min = "0";
+          input.step = "1";
+          input.inputMode = "numeric";
+        }
+        if (type === "textarea") input.rows = 4;
+        wrap.append(label, input);
+        parent.appendChild(wrap);
+        return input;
+      }
+      function renderPlatforms() {
+        grid.replaceChildren();
+        platforms.forEach((platform) => {
+          const saved = state.platforms[platform.id];
+          const card = make("article", "platform-card");
+          const head = make("div", "platform-head");
+          head.append(make("div", "platform-mark", platform.mark));
+          const intro = make("div");
+          intro.append(make("h3", "", platform.name), make("p", "", platform.tagline));
+          head.appendChild(intro);
+          card.appendChild(head);
+
+          const statusLine = make("div", "status-line");
+          const stateLabel = make("label");
+          stateLabel.htmlFor = platform.id + "-status";
+          const dot = make("span", "status-indicator");
+          const stateText = make("span", "", statusOptions.find((option) => option[0] === saved.status)[1]);
+          stateLabel.append(dot, stateText);
+          const select = make("select");
+          select.id = platform.id + "-status";
+          select.setAttribute("aria-label", platform.name + " status");
+          statusOptions.forEach(([value, label]) => {
+            const option = make("option", "", label);
+            option.value = value;
+            select.appendChild(option);
+          });
+          select.value = saved.status;
+          dot.classList.toggle("is-ready", saved.status === "drafted");
+          dot.classList.toggle("is-live", saved.status === "published");
+          dot.classList.toggle("is-done", saved.status === "followedup");
+          select.addEventListener("change", () => {
+            state.platforms[platform.id].status = select.value;
+            const selected = statusOptions.find((option) => option[0] === select.value);
+            stateLabel.querySelector("span:last-child").textContent = selected[1];
+            dot.classList.toggle("is-ready", select.value === "drafted");
+            dot.classList.toggle("is-live", select.value === "published");
+            dot.classList.toggle("is-done", select.value === "followedup");
+            persist("Updated " + platform.name + " status.");
+          });
+          statusLine.append(stateLabel, select);
+          card.appendChild(statusLine);
+
+          const titleInput = appendField(card, platform.id + "-title", "Post title", saved.title, "text");
+          titleInput.maxLength = 240;
+          const bodyInput = appendField(card, platform.id + "-body", "Post draft", saved.body, "textarea");
+          bodyInput.maxLength = 5000;
+          titleInput.addEventListener("input", () => {
+            state.platforms[platform.id].title = titleInput.value;
+            persist("Saved your " + platform.name + " draft.");
+          });
+          bodyInput.addEventListener("input", () => {
+            state.platforms[platform.id].body = bodyInput.value;
+            persist("Saved your " + platform.name + " draft.");
+          });
+
+          const draftTools = make("div", "draft-tools");
+          const copyTitle = make("button", "secondary", "Copy title");
+          copyTitle.type = "button";
+          copyTitle.addEventListener("click", () => copyText(titleInput.value, "Title copied. Paste it into " + platform.name + "."));
+          const copyBody = make("button", "", "Copy post");
+          copyBody.type = "button";
+          copyBody.addEventListener("click", () => copyText(bodyInput.value, "Draft copied. Review and personalize it before posting."));
+          draftTools.append(copyTitle, copyBody);
+          card.appendChild(draftTools);
+
+          const metrics = make("div", "metrics-grid");
+          [["visits", "Visits"], ["replies", "Replies / feedback"], ["learners", "Learners reached"]].forEach(([key, label]) => {
+            const input = make("input");
+            input.type = "number";
+            input.min = "0";
+            input.step = "1";
+            input.inputMode = "numeric";
+            input.value = String(saved[key]);
+            input.setAttribute("aria-label", platform.name + " " + label);
+            const labelEl = make("label", "field");
+            labelEl.append(make("span", "", label), input);
+            input.addEventListener("change", () => {
+              input.value = String(numeric(input.value));
+              state.platforms[platform.id][key] = numeric(input.value);
+              persist("Updated manual results for " + platform.name + ".");
+            });
+            metrics.appendChild(labelEl);
+          });
+          card.appendChild(metrics);
+
+          const actions = make("div", "platform-actions");
+          const open = make("a", "button secondary", "Open platform ↗");
+          open.href = platform.url;
+          open.target = "_blank";
+          open.rel = "noopener noreferrer";
+          const guide = make("a", "button secondary", "Read guidelines ↗");
+          guide.href = platform.guide;
+          guide.target = "_blank";
+          guide.rel = "noopener noreferrer";
+          actions.append(open, guide);
+          card.appendChild(actions);
+          grid.appendChild(card);
+        });
+      }
+      async function copyText(value, successMessage) {
+        if (!String(value).trim()) {
+          statusMessage.textContent = "There is no text to copy yet.";
+          statusMessage.style.color = "var(--gold)";
+          return;
+        }
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(value);
+          } else {
+            const helper = make("textarea");
+            helper.value = value;
+            helper.setAttribute("readonly", "");
+            helper.style.position = "fixed";
+            helper.style.opacity = "0";
+            document.body.appendChild(helper);
+            helper.select();
+            const copied = document.execCommand("copy");
+            helper.remove();
+            if (!copied) throw new Error("Copy command was blocked");
+          }
+          statusMessage.textContent = successMessage;
+          statusMessage.style.color = "var(--green)";
+        } catch (_) {
+          statusMessage.textContent = "Copy was blocked by the browser. Select the draft text and copy it manually.";
+          statusMessage.style.color = "var(--gold)";
+        }
+      }
+      function renderSummary() {
+        let prepared = 0;
+        let visits = 0;
+        let replies = 0;
+        let learners = 0;
+        platforms.forEach((platform) => {
+          const item = state.platforms[platform.id];
+          if (item.status !== "todo") prepared += 1;
+          visits += numeric(item.visits);
+          replies += numeric(item.replies);
+          learners += numeric(item.learners);
+        });
+        $("prepared-count").textContent = prepared + "/5";
+        $("total-visits").textContent = String(visits);
+        $("total-replies").textContent = String(replies);
+        $("total-learners").textContent = String(learners);
+        $("progress-fill").style.width = (prepared / platforms.length * 100) + "%";
+        $("progress-track").setAttribute("aria-valuenow", String(prepared));
+      }
+      function exportPlan() {
+        const payload = {
+          product: "cH Code Helper",
+          website: PROJECT_URL,
+          exportedAt: new Date().toISOString(),
+          launchDate: state.launchDate,
+          platforms: state.platforms,
+          checklist: state.checklist,
+          note: "Statuses and metrics were entered by the user; they are not fetched from platform APIs."
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = make("a");
+        link.href = url;
+        link.download = "ch-code-helper-launch-plan.json";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+        statusMessage.textContent = "Exported your launch plan.";
+        statusMessage.style.color = "var(--green)";
+      }
+      $("launch-date").value = state.launchDate;
+      $("launch-date").addEventListener("change", () => {
+        state.launchDate = $("launch-date").value;
+        persist(state.launchDate ? "Launch reminder saved for " + state.launchDate + "." : "Launch date cleared.");
+      });
+      document.querySelectorAll("[data-check]").forEach((checkbox) => {
+        const key = checkbox.dataset.check;
+        checkbox.checked = state.checklist[key] === true;
+        checkbox.addEventListener("change", () => {
+          state.checklist[key] = checkbox.checked;
+          persist("Updated pre-launch checklist.");
+        });
+      });
+      $("export-plan").addEventListener("click", exportPlan);
+      $("reset-plan").addEventListener("click", () => {
+        if (!window.confirm("Reset all locally saved launch drafts, statuses, date, metrics, and checklist items?")) return;
+        state = freshState();
+        try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+        $("launch-date").value = "";
+        document.querySelectorAll("[data-check]").forEach((checkbox) => { checkbox.checked = false; });
+        renderPlatforms();
+        persist("Launch plan reset in this browser.");
+      });
+      renderPlatforms();
+      renderSummary();
+      statusMessage.textContent = "Loaded your local launch plan. Changes save automatically.";
+    })();
+  </script>
+</body>
+</html>
